@@ -1,19 +1,26 @@
 {
   "name": "json-seal",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Cryptographically signed, tamper‑proof JSON backups with deterministic canonicalization and RSA‑PSS signatures.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
     "build": "tsc",
-    "dev": "tsx src/index.ts"
+    "test": "vitest",
+    "test:watch": "vitest --watch"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^25.0.6",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
   }
 }
