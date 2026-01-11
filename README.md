@@ -1,5 +1,6 @@
 # **json‑seal**
-Cryptographically signed, tamper‑proof JSON backups for apps.
+# json‑seal
+Cryptographically signed, tamper‑proof JSON backups for apps — zero dependencies and a tiny footprint under 5 kB.
 
 json‑seal lets you:
 
