@@ -4,6 +4,7 @@
   "description": "Cryptographically signed, tamper‑proof JSON backups with deterministic canonicalization and RSA‑PSS signatures.",
   "type": "module",
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
@@ -11,8 +12,25 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
   "files": [
     "dist"
+  ],
+  "keywords": [
+    "cryptography",
+    "digital-signature",
+    "tamper-detection",
+    "data-integrity",
+    "rsa-pss",
+    "json",
+    "json-security",
+    "json-signing",
+    "canonicalization",
+    "typescript",
+    "nodejs"
   ],
   "repository": {
     "type": "git",
