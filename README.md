@@ -1,4 +1,3 @@
-# **json‑seal**
 # json‑seal
 Cryptographically signed, tamper‑proof JSON backups for apps — zero dependencies and a tiny footprint under 5 kB.
 
@@ -14,7 +13,7 @@ It’s like JWS, but for **arbitrary JSON documents**, without JWT baggage, and 
 
 ---
 
-## **Why json‑seal?**
+## Why json‑seal?
 
 Most signing libraries assume:
 
@@ -38,7 +37,7 @@ If the JSON changes — even whitespace — verification fails.
 
 ---
 
-## **Installation**
+## Installation
 
 ```bash
 npm install json-seal
@@ -46,9 +45,9 @@ npm install json-seal
 
 ---
 
-## **Quick Start**
+## Quick Start
 
-### **Generate a keypair**
+### Generate a keypair
 
 ```ts
 import { generateKeyPair } from "json-seal";
@@ -56,7 +55,7 @@ import { generateKeyPair } from "json-seal";
 const { privateKey, publicKey } = generateKeyPair();
 ```
 
-### **Sign a payload**
+### Sign a payload
 
 ```ts
 import { signPayload } from "json-seal";
@@ -66,7 +65,7 @@ const payload = { id: 1, data: "hello" };
 const backup = signPayload(payload, privateKey, publicKey);
 ```
 
-### **Verify a backup**
+### Verify a backup
 
 ```ts
 import { verifyBackup } from "json-seal";
@@ -80,7 +79,7 @@ if (result.valid) {
 
 ---
 
-## **What a signed backup looks like**
+## What a signed backup looks like
 
 ```json
 {
@@ -99,7 +98,7 @@ Everything needed to verify the backup is embedded.
 
 ---
 
-## **Tamper Detection**
+## Tamper Detection
 
 Any modification — even deep inside nested objects — invalidates the signature.
 
@@ -111,12 +110,12 @@ verifyBackup(tampered).valid; // false
 
 ---
 
-## **Key Management**
+## Key Management
 
 `generateKeyPair()` should be called **once**, not on every backup.  
 Apps are expected to generate or receive a keypair during onboarding and store it securely.
 
-### **App‑generated keys**
+### App‑generated keys
 
 Most offline‑first apps generate a keypair on first launch:
 
@@ -151,7 +150,7 @@ Storage depends on the platform:
 
 json‑seal intentionally does **not** handle storage so it can remain environment‑agnostic.
 
-### **Server‑generated keys**
+### Server‑generated keys
 
 Some architectures prefer the backend to generate and manage keys:
 
@@ -163,7 +162,7 @@ Some architectures prefer the backend to generate and manage keys:
 
 This is useful for multi‑device accounts or enterprise systems.
 
-### **Key rotation**
+### Key rotation
 
 json‑seal embeds the public key inside each backup, so old backups remain verifiable even after rotation.
 
@@ -174,7 +173,7 @@ A typical rotation strategy:
 - keep old public keys for verification  
 - continue verifying old backups without breaking anything  
 
-### **Importing and exporting keys**
+### Importing and exporting keys
 
 Keys are standard PEM strings, so they can be:
 
@@ -187,7 +186,7 @@ This makes json‑seal suitable for long‑term, portable backup formats.
 
 ---
 
-## **API**
+## API
 
 ### `generateKeyPair()`
 Generates a 2048‑bit RSA keypair.
@@ -208,7 +207,7 @@ Deterministic JSON serializer with sorted keys.
 
 ---
 
-## **Testing**
+## Testing
 
 json‑seal ships with a full Vitest suite covering:
 
@@ -231,7 +230,7 @@ npm test
 
 ---
 
-## **License**
+## License
 
 MIT
 
