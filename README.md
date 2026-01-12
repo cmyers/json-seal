@@ -1,4 +1,5 @@
-# json‑seal
+# **json‑seal**
+
 Cryptographically signed, tamper‑proof JSON backups for apps — zero dependencies and a tiny footprint under 5 kB.
 
 json‑seal lets you:
@@ -9,35 +10,66 @@ json‑seal lets you:
 - Verify integrity later  
 - Detect any tampering — even a single character  
 
-It’s like JWS, but for **arbitrary JSON documents**, without JWT baggage, and designed for **offline‑first apps**, **local backups**, and **portable integrity checks**.
+It’s like JWS, but for **arbitrary JSON documents**, without JWT complexity, and designed for **offline‑first apps**, **local backups**, and **portable integrity checks**.
 
 ---
 
-## Why json‑seal?
+## **Why json‑seal exists**
 
-Most signing libraries assume:
+Most security libraries focus on:
 
-- JWT semantics  
-- base64url encoding  
-- fixed claim structures  
-- web‑auth use cases  
+- encrypted blobs (iron‑webcrypto)  
+- authentication tokens (JOSE/JWS/JWT)  
+- low‑level primitives (WebCrypto, libsodium)  
 
-json‑seal is different.
+None of these solves the problem of:
 
-It’s built for apps that need:
+**“I need to store or transmit JSON in a way that guarantees it hasn’t been tampered with — while keeping it readable, portable, and framework‑agnostic.”**
 
-- Portable, self‑contained backups  
-- Cryptographic tamper detection  
-- Deterministic canonicalization  
-- Zero dependencies  
-- Clean TypeScript API  
-- Works in Node today (browser support coming next)  
+json‑seal fills that gap.
 
+It turns any JSON object into a **sealed artifact** that can be verified anywhere, on any device, without servers, shared secrets, or opaque binary formats. The result is a portable, human‑readable, cryptographically signed JSON document that remains trustworthy for years.
+
+---
+
+## **Features**
+
+### **Deterministic canonicalization**  
+Stable, cross‑platform byte representation of JSON for reliable signatures.  
 If the JSON changes — even whitespace — verification fails.
 
+### **RSA‑PSS digital signatures**  
+Modern, secure, asymmetric signing using the WebCrypto API.  
+No shared passwords, no symmetric secrets, no server dependency.
+
+### **Pure JSON seal format**  
+Human‑readable, portable, and easy to store, sync, export, or transmit.  
+Everything needed for verification is embedded.
+
+### **Browser + Node support**  
+Works anywhere `crypto.subtle` is available — modern browsers, PWAs, Node 18+, Bun, Deno, and edge runtimes.
+
+### **Framework‑agnostic**  
+Angular, React, Vue, Svelte, Ionic, Capacitor, PWAs, Node, Bun, Deno — json‑seal fits everywhere.
+
+### **Zero dependencies**  
+Small, auditable, and safe for long‑term use.  
+No polyfills, no crypto libraries, no runtime baggage.
+
+### **Perfect for offline‑first apps**  
+Protects:
+
+- Local storage  
+- IndexedDB  
+- Sync engines  
+- User‑exported backups  
+- Cross‑device data portability  
+
+json‑seal is built for apps that need **trustworthy, tamper‑proof JSON**, not tokens or encrypted blobs.
+
 ---
 
-## Installation
+## **Installation**
 
 ```bash
 npm install json-seal
@@ -45,32 +77,32 @@ npm install json-seal
 
 ---
 
-## Quick Start
+## **Quick Start**
 
-### Generate a keypair
+### **Generate a keypair**
 
 ```ts
 import { generateKeyPair } from "json-seal";
 
-const { privateKey, publicKey } = generateKeyPair();
+const { privateKey, publicKey } = await generateKeyPair();
 ```
 
-### Sign a payload
+### **Sign a payload**
 
 ```ts
 import { signPayload } from "json-seal";
 
 const payload = { id: 1, data: "hello" };
 
-const backup = signPayload(payload, privateKey, publicKey);
+const backup = await signPayload(payload, privateKey, publicKey);
 ```
 
-### Verify a backup
+### **Verify a backup**
 
 ```ts
 import { verifyBackup } from "json-seal";
 
-const result = verifyBackup(backup);
+const result = await verifyBackup(backup);
 
 if (result.valid) {
   console.log("Payload:", result.payload);
@@ -79,7 +111,7 @@ if (result.valid) {
 
 ---
 
-## What a signed backup looks like
+## **What a signed backup looks like**
 
 ```json
 {
@@ -98,7 +130,7 @@ Everything needed to verify the backup is embedded.
 
 ---
 
-## Tamper Detection
+## **Tamper Detection**
 
 Any modification — even deep inside nested objects — invalidates the signature.
 
@@ -110,47 +142,52 @@ verifyBackup(tampered).valid; // false
 
 ---
 
-## Key Management
+## **Key Management**
 
 `generateKeyPair()` should be called **once**, not on every backup.  
 Apps are expected to generate or receive a keypair during onboarding and store it securely.
 
-### App‑generated keys
+---
+
+### **App‑generated keys**
 
 Most offline‑first apps generate a keypair on first launch:
 
 ```ts
 import { generateKeyPair } from "json-seal";
 
-const { privateKey, publicKey } = generateKeyPair();
+const { privateKey, publicKey } = await generateKeyPair();
 
-// Store securely (examples below)
 secureStore.set("privateKey", privateKey);
 secureStore.set("publicKey", publicKey);
 ```
 
-On subsequent runs, the app loads the stored keys:
+On subsequent runs:
 
 ```ts
 const privateKey = secureStore.get("privateKey");
 const publicKey = secureStore.get("publicKey");
 
-const backup = signPayload(data, privateKey, publicKey);
+const backup = await signPayload(data, privateKey, publicKey);
 ```
+
+---
 
 ### **Where to store keys**
 
 Storage depends on the platform:
 
-- **iOS** → Keychain  
-- **Android** → Keystore  
-- **Web** → IndexedDB + WebCrypto (coming soon)  
-- **Desktop** → OS keyring or encrypted local file  
-- **Node** → environment variables or encrypted file  
+- iOS → Keychain  
+- Android → Keystore  
+- Web → IndexedDB + WebCrypto  
+- Desktop → OS keyring or encrypted local file  
+- Node → environment variables or encrypted file  
 
 json‑seal intentionally does **not** handle storage so it can remain environment‑agnostic.
 
-### Server‑generated keys
+---
+
+### **Server‑generated keys**
 
 Some architectures prefer the backend to generate and manage keys:
 
@@ -160,54 +197,58 @@ Some architectures prefer the backend to generate and manage keys:
 4. App signs backups using the server’s public key  
 5. Server verifies integrity later  
 
-This is useful for multi‑device accounts or enterprise systems.
+Useful for multi‑device accounts or enterprise systems.
 
-### Key rotation
+---
+
+### **Key rotation**
 
 json‑seal embeds the public key inside each backup, so old backups remain verifiable even after rotation.
 
-A typical rotation strategy:
+Typical strategy:
 
 - generate a new keypair yearly  
 - store the new private key  
 - keep old public keys for verification  
 - continue verifying old backups without breaking anything  
 
-### Importing and exporting keys
+---
+
+### **Importing and exporting keys**
 
 Keys are standard PEM strings, so they can be:
 
 - backed up  
-- migrated between devices  
-- synced across platforms  
-- exported/imported by the user  
+- migrated  
+- synced  
+- exported/imported  
 
-This makes json‑seal suitable for long‑term, portable backup formats.
+Perfect for long‑term, portable backup formats.
 
 ---
 
-## API
+## **API**
 
-### `generateKeyPair()`
-Generates a 2048‑bit RSA keypair.
+### **`generateKeyPair()`**
+Generates a 2048‑bit RSA‑PSS keypair using WebCrypto.
 
-### `signPayload(payload, privateKey, publicKey)`
+### **`signPayload(payload, privateKey, publicKey)`**
 - Canonicalizes the JSON  
 - Signs it using RSA‑PSS SHA‑256  
 - Embeds the public key  
 - Returns a portable backup object  
 
-### `verifyBackup(backup)`
+### **`verifyBackup(backup)`**
 - Re‑canonicalizes the payload  
 - Verifies the signature  
 - Returns `{ valid: boolean, payload?: any }`  
 
-### `canonicalize(obj)`
+### **`canonicalize(obj)`**
 Deterministic JSON serializer with sorted keys.
 
 ---
 
-## Testing
+## **Testing**
 
 json‑seal ships with a full Vitest suite covering:
 
@@ -230,7 +271,9 @@ npm test
 
 ---
 
-## License
+Pull Requests welcome.
+
+## **License**
 
 MIT
 
