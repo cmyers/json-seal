@@ -1,4 +1,10 @@
 # **json‑seal**
+![npm version](https://img.shields.io/npm/v/json-seal)
+![license](https://img.shields.io/npm/l/json-seal)
+![types](https://img.shields.io/badge/types-TypeScript-blue)
+![bundle size](https://img.shields.io/bundlephobia/minzip/json-seal)
+![crypto](https://img.shields.io/badge/crypto-RSA--PSS-green)
+![npm downloads](https://img.shields.io/npm/dm/json-seal)
 
 Cryptographically signed, tamper‑proof JSON backups for apps - zero dependencies and a tiny footprint under 5 kB.
 
