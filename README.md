@@ -1,6 +1,6 @@
 # **json‑seal**
 
-Cryptographically signed, tamper‑proof JSON backups for apps — zero dependencies and a tiny footprint under 5 kB.
+Cryptographically signed, tamper‑proof JSON backups for apps - zero dependencies and a tiny footprint under 5 kB.
 
 json‑seal lets you:
 
@@ -8,7 +8,7 @@ json‑seal lets you:
 - Sign it with a private key  
 - Embed the public key  
 - Verify integrity later  
-- Detect any tampering — even a single character  
+- Detect any tampering - even a single character  
 
 It’s like JWS, but for **arbitrary JSON documents**, without JWT complexity, and designed for **offline‑first apps**, **local backups**, and **portable integrity checks**.
 
@@ -24,7 +24,7 @@ Most security libraries focus on:
 
 None of these solves the problem of:
 
-**“I need to store or transmit JSON in a way that guarantees it hasn’t been tampered with — while keeping it readable, portable, and framework‑agnostic.”**
+**“I need to store or transmit JSON in a way that guarantees it hasn’t been tampered with - while keeping it readable, portable, and framework‑agnostic.”**
 
 json‑seal fills that gap.
 
@@ -36,34 +36,34 @@ It turns any JSON object into a **sealed artifact** that can be verified anywher
 
 ### **Deterministic canonicalization**  
 Stable, cross‑platform byte representation of JSON for reliable signatures.  
-If the JSON changes — even whitespace — verification fails.
+If the JSON changes - even whitespace - verification fails.
 
 ### **RSA‑PSS digital signatures**  
-Modern, secure, asymmetric signing using the WebCrypto API.  
+Modern, secure, asymmetric signing using the WebCrypto API.
 No shared passwords, no symmetric secrets, no server dependency.
 
-### **Pure JSON seal format**  
+### **Pure JSON seal format**
 Human‑readable, portable, and easy to store, sync, export, or transmit.  
 Everything needed for verification is embedded.
 
-### **Browser + Node support**  
-Works anywhere `crypto.subtle` is available — modern browsers, PWAs, Node 18+, Bun, Deno, and edge runtimes.
+### **Browser + Node support**
+Works anywhere `crypto.subtle` is available - modern browsers, PWAs, Node 18+, Bun, Deno, and edge runtimes.
 
-### **Framework‑agnostic**  
-Angular, React, Vue, Svelte, Ionic, Capacitor, PWAs, Node, Bun, Deno — json‑seal fits everywhere.
+### **Framework‑agnostic**
+Angular, React, Vue, Svelte, Ionic, Capacitor, PWAs, Node, Bun, Deno - json‑seal fits everywhere.
 
-### **Zero dependencies**  
-Small, auditable, and safe for long‑term use.  
+### **Zero dependencies** 
+Small, auditable, and safe for long‑term use.
 No polyfills, no crypto libraries, no runtime baggage.
 
-### **Perfect for offline‑first apps**  
+### **Perfect for offline‑first apps**
 Protects:
 
-- Local storage  
-- IndexedDB  
-- Sync engines  
-- User‑exported backups  
-- Cross‑device data portability  
+- Local storage
+- IndexedDB
+- Sync engines
+- User‑exported backups
+- Cross‑device data portability
 
 json‑seal is built for apps that need **trustworthy, tamper‑proof JSON**, not tokens or encrypted blobs.
 
@@ -132,7 +132,7 @@ Everything needed to verify the backup is embedded.
 
 ## **Tamper Detection**
 
-Any modification — even deep inside nested objects — invalidates the signature.
+Any modification - even deep inside nested objects - invalidates the signature.
 
 ```ts
 const tampered = { ...backup, payload: { id: 1, data: "hacked" } };
