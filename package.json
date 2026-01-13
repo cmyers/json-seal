@@ -1,6 +1,6 @@
 {
   "name": "json-seal",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Cryptographically signed, tamper‑proof JSON backups with deterministic canonicalization and RSA‑PSS signatures.",
   "type": "module",
   "main": "./dist/index.js",
