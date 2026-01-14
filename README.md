@@ -1,79 +1,62 @@
 # **json‑seal**
 ![npm version](https://img.shields.io/npm/v/json-seal)
-![license](https://img.shields.io/npm/l/json-seal)
+![Deterministic JSON](https://img.shields.io/badge/Deterministic%20JSON-RFC%208785%20Compliant-success)
+![crypto](https://img.shields.io/badge/crypto-RSA--PSS-green)
+![dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
 ![types](https://img.shields.io/badge/types-TypeScript-blue)
 ![bundle size](https://img.shields.io/bundlephobia/minzip/json-seal)
-![crypto](https://img.shields.io/badge/crypto-RSA--PSS-green)
 ![npm downloads](https://img.shields.io/npm/dm/json-seal)
 
-Cryptographically signed, tamper‑proof JSON backups for apps - zero dependencies and a tiny footprint under 5 kB.
-
-json‑seal lets you:
-
-- Canonicalize any JSON object  
-- Sign it with a private key  
-- Embed the public key  
-- Verify integrity later  
-- Detect any tampering - even a single character  
-
-It’s like JWS, but for **arbitrary JSON documents**, without JWT complexity, and designed for **offline‑first apps**, **local backups**, and **portable integrity checks**.
+**A lightweight, zero‑dependency library for creating cryptographically signed, tamper‑proof JSON backups.**
 
 ---
 
-## **Why json‑seal exists**
+## **Why json‑seal**
 
-Most security libraries focus on:
+Apps often need to store or transmit JSON in a way that guarantees it hasn’t been tampered with — without relying on servers, tokens, or opaque binary formats. Most security libraries focus on encrypted blobs, authentication tokens, or low‑level crypto primitives, but none solve the simple problem:
 
-- encrypted blobs (iron‑webcrypto)  
-- authentication tokens (JOSE/JWS/JWT)  
-- low‑level primitives (WebCrypto, libsodium)  
+**“I need to store JSON in a way that guarantees integrity — while keeping it readable, portable, and framework‑agnostic.”**
 
-None of these solves the problem of:
+json‑seal fills that gap. It lets you:
 
-**“I need to store or transmit JSON in a way that guarantees it hasn’t been tampered with - while keeping it readable, portable, and framework‑agnostic.”**
+- Canonicalize any JSON value  
+- Sign it with a private key  
+- Embed the public key  
+- Verify integrity later  
+- Detect any tampering — even a single character  
 
-json‑seal fills that gap.
-
-It turns any JSON object into a **sealed artifact** that can be verified anywhere, on any device, without servers, shared secrets, or opaque binary formats. The result is a portable, human‑readable, cryptographically signed JSON document that remains trustworthy for years.
+It’s like JWS, but for **arbitrary JSON documents**, without JWT complexity, and designed for **offline‑first apps**, **local backups**, and **portable integrity checks**. It turns any JSON value into a **portable, human‑readable, cryptographically signed artifact** that can be verified anywhere, on any device, with no external dependencies.
 
 ---
 
 ## **Features**
 
-### **Deterministic canonicalization**  
-json‑seal produces a deterministic, canonical byte representation of JSON values.
-The same input always yields the same canonical output within a given runtime,
-ensuring signatures remain stable and verifiable. **Cross‑runtime consistency will
-be fully guaranteed as the canonicalizer reaches complete RFC 8785 compliance.**
+### **RFC 8785 Canonical JSON**
+Deterministic, cross‑runtime canonicalization:
 
-### **RSA‑PSS digital signatures**  
-Modern, secure, asymmetric signing using the WebCrypto API.
-No shared passwords, no symmetric secrets, no server dependency.
+- sorted keys  
+- strict number formatting  
+- ECMAScript string escaping  
+- duplicate‑key rejection  
+- stable UTF‑8 output  
 
-### **Pure JSON seal format**
-Human‑readable, portable, and easy to store, sync, export, or transmit.  
-Everything needed for verification is embedded.
+### **RSA‑PSS Signatures**
+Modern asymmetric signing using WebCrypto.  
+No shared secrets. No servers. No dependencies.
 
-### **Browser + Node support**
-Works anywhere `crypto.subtle` is available - modern browsers, PWAs, Node 18+, Bun, Deno, and edge runtimes.
+### **Portable JSON Backup Format**
+Everything needed for verification is embedded:
 
-### **Framework‑agnostic**
-Angular, React, Vue, Svelte, Ionic, Capacitor, PWAs, Node, Bun, Deno - json‑seal fits everywhere.
+- payload  
+- timestamp  
+- signature  
+- public key  
 
-### **Zero dependencies** 
+### **Works Everywhere**
+Browsers, PWAs, Node 18+, Bun, Deno, and mobile runtimes.
+
+### **Zero Dependencies**
 Small, auditable, and safe for long‑term use.
-No polyfills, no crypto libraries, no runtime baggage.
-
-### **Perfect for offline‑first apps**
-Protects:
-
-- Local storage
-- IndexedDB
-- Sync engines
-- User‑exported backups
-- Cross‑device data portability
-
-json‑seal is built for apps that need **trustworthy, tamper‑proof JSON**, not tokens or encrypted blobs.
 
 ---
 
@@ -119,7 +102,7 @@ if (result.valid) {
 
 ---
 
-## **What a signed backup looks like**
+## **Example Backup**
 
 ```json
 {
@@ -134,13 +117,11 @@ if (result.valid) {
 }
 ```
 
-Everything needed to verify the backup is embedded.
-
 ---
 
 ## **Tamper Detection**
 
-Any modification - even deep inside nested objects - invalidates the signature.
+Any modification — even deep inside nested objects — invalidates the signature.
 
 ```ts
 const tampered = { ...backup, payload: { id: 1, data: "hacked" } };
@@ -150,123 +131,44 @@ verifyBackup(tampered).valid; // false
 
 ---
 
-## **Key Management**
-
-`generateKeyPair()` should be called **once**, not on every backup.  
-Apps are expected to generate or receive a keypair during onboarding and store it securely.
-
----
-
-### **App‑generated keys**
-
-Most offline‑first apps generate a keypair on first launch:
-
-```ts
-import { generateKeyPair } from "json-seal";
-
-const { privateKey, publicKey } = await generateKeyPair();
-
-secureStore.set("privateKey", privateKey);
-secureStore.set("publicKey", publicKey);
-```
-
-On subsequent runs:
-
-```ts
-const privateKey = secureStore.get("privateKey");
-const publicKey = secureStore.get("publicKey");
-
-const backup = await signPayload(data, privateKey, publicKey);
-```
-
----
-
-### **Where to store keys**
-
-Storage depends on the platform:
-
-- iOS → Keychain  
-- Android → Keystore  
-- Web → IndexedDB + WebCrypto  
-- Desktop → OS keyring or encrypted local file  
-- Node → environment variables or encrypted file  
-
-json‑seal intentionally does **not** handle storage so it can remain environment‑agnostic.
-
----
-
-### **Server‑generated keys**
-
-Some architectures prefer the backend to generate and manage keys:
-
-1. Server generates keypair  
-2. Server stores private key  
-3. Server sends public key to the app  
-4. App signs backups using the server’s public key  
-5. Server verifies integrity later  
-
-Useful for multi‑device accounts or enterprise systems.
-
----
-
-### **Key rotation**
-
-json‑seal embeds the public key inside each backup, so old backups remain verifiable even after rotation.
-
-Typical strategy:
-
-- generate a new keypair yearly  
-- store the new private key  
-- keep old public keys for verification  
-- continue verifying old backups without breaking anything  
-
----
-
-### **Importing and exporting keys**
-
-Keys are standard PEM strings, so they can be:
-
-- backed up  
-- migrated  
-- synced  
-- exported/imported  
-
-Perfect for long‑term, portable backup formats.
-
----
-
 ## **API**
 
-### **`generateKeyPair()`**
-Generates a 2048‑bit RSA‑PSS keypair using WebCrypto.
+### **`generateKeyPair()`**  
+Generates a 2048‑bit RSA‑PSS keypair.
 
-### **`signPayload(payload, privateKey, publicKey)`**
-- Canonicalizes the JSON  
-- Signs it using RSA‑PSS SHA‑256  
-- Embeds the public key  
-- Returns a portable backup object  
+### **`signPayload(payload, privateKey, publicKey)`**  
+Canonicalizes the payload, signs it, and returns a sealed backup object.
 
-### **`verifyBackup(backup)`**
-- Re‑canonicalizes the payload  
-- Verifies the signature  
-- Returns `{ valid: boolean, payload?: any }`  
+### **`verifyBackup(backup)`**  
+Verifies the signature and returns `{ valid, payload? }`.
 
-### **`canonicalize(obj)`**
-Deterministic JSON serializer with sorted keys.
+### **`canonicalize(value)`**  
+Full RFC 8785 Canonical JSON implementation.
+
+---
+
+## **Prior Art**
+
+json‑seal builds on ideas from:
+
+- **json-canonicalize** — RFC 8785 canonicalization (no signing or backup format)  
+- **rfc8785 (Python)** — pure Python canonicalizer  
+- **jcs (Elixir)** — Elixir implementation of JCS  
+- **JOSE / JWS / JWT** — signing standards focused on tokens, not arbitrary JSON  
+
+json‑seal combines **canonicalization + signing + verification** into a single, zero‑dependency library designed for **offline‑first, portable JSON integrity**.
 
 ---
 
 ## **Testing**
 
-json‑seal ships with a full Vitest suite covering:
+The test suite covers:
 
+- RFC 8785 canonicalization  
+- Unicode and number edge cases  
 - Valid signatures  
-- Shallow tampering  
-- Deep tampering  
-- Missing signature  
-- Wrong public key  
-- Corrupted signature  
-- Canonicalization stability  
+- Shallow and deep tampering  
+- Missing / wrong / corrupted signatures  
 - Large payloads  
 - Arrays and primitives  
 - RSA‑PSS non‑determinism  
@@ -278,9 +180,7 @@ npm test
 ```
 
 ---
-
-Pull Requests welcome.
-
+Pull Requests are welcome.
 ## **License**
 
 MIT
