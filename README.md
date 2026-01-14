@@ -1,15 +1,18 @@
-# **json‑seal**
-![npm version](https://img.shields.io/npm/v/json-seal)
-![Deterministic JSON](https://img.shields.io/badge/Deterministic%20JSON-RFC%208785%20Compliant-success)
-![crypto](https://img.shields.io/badge/crypto-RSA--PSS-green)
-![dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
-![types](https://img.shields.io/badge/types-TypeScript-blue)
-![bundle size](https://img.shields.io/bundlephobia/minzip/json-seal)
-![npm downloads](https://img.shields.io/npm/dm/json-seal)
+<h1 align="center">json-seal</h1>
 
-**A lightweight, zero‑dependency library for creating cryptographically signed, tamper‑proof JSON backups.**
+<p align="center">
+  <img src="https://github.com/cmyers/json-seal/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI" />
+  <img src="https://img.shields.io/npm/v/json-seal" alt="npm version" />
+  <img src="https://img.shields.io/badge/Deterministic%20JSON-RFC%208785%20Compliant-success" alt="Deterministic JSON" />
+  <img src="https://img.shields.io/badge/dependencies-0-brightgreen" alt="dependencies" />
+  <img src="https://img.shields.io/badge/types-TypeScript-blue" alt="types" />
+  <img src="https://img.shields.io/bundlephobia/minzip/json-seal" alt="bundle size" />
+  <img src="https://img.shields.io/github/license/cmyers/json-seal" alt="license" />
+</p>
 
----
+<h3 align="center">
+  A lightweight, zero‑dependency library for creating cryptographically signed, tamper‑proof JSON backups.
+</h3>
 
 ## **Why json‑seal**
 
