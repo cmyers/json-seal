@@ -41,8 +41,10 @@ It turns any JSON object into a **sealed artifact** that can be verified anywher
 ## **Features**
 
 ### **Deterministic canonicalization**  
-Stable, cross‑platform byte representation of JSON for reliable signatures.  
-If the JSON changes - even whitespace - verification fails.
+json‑seal produces a deterministic, canonical byte representation of JSON values.
+The same input always yields the same canonical output within a given runtime,
+ensuring signatures remain stable and verifiable. **Cross‑runtime consistency will
+be fully guaranteed as the canonicalizer reaches complete RFC 8785 compliance.**
 
 ### **RSA‑PSS digital signatures**  
 Modern, secure, asymmetric signing using the WebCrypto API.
