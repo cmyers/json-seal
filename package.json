@@ -1,6 +1,6 @@
 {
   "name": "json-seal",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "Create cryptographically signed, tamper‑proof JSON backups with zero dependencies.",
   "type": "module",
   "main": "./dist/index.js",
