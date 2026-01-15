@@ -127,7 +127,7 @@ if (result.valid) {
 Any modification — even deep inside nested objects — invalidates the signature.
 
 ```ts
-const tampered = { ...backup, payload: { id: 1, data: "hacked" } };
+const tampered = { ...backup, payload: { id: 1, data: "modified" } };
 
 verifyBackup(tampered).valid; // false
 ```
