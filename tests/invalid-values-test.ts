@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeAll } from "vitest";
-import { generateKeyPair, signPayload } from "../src/sign";
+import { signPayload } from "../src/sign";
+import { generateKeyPair } from "../src/keys";
 
 describe("signPayload rejects invalid JSON values", () => {
   let privateKey: string;
@@ -32,10 +33,10 @@ describe("signPayload rejects invalid JSON values", () => {
   invalidValues.push(circular);
 
   for (const value of invalidValues) {
-    test(`rejects invalid value: ${String(value)}`, async () => {
-      await expect(() =>
-        signPayload(value as any, privateKey, publicKey)
-      ).rejects.toThrow();
-    });
-  }
+  test(`rejects invalid value: ${String(value)}`, async () => {
+    await expect(
+      signPayload(value as any, privateKey, publicKey)
+    ).rejects.toThrow();
+  });
+}
 });

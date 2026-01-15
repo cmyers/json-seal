@@ -1,34 +1,16 @@
-import {
-  generateKeyPairSync,
-  createSign,
-  constants
-} from "crypto";
 import { canonicalize } from "./canonicalize.js";
+import { importPrivateKey } from "./keys.js";
+import { signCanonical } from "./crypto-sign.js";
+import { arrayBufferToBase64 } from "./base64.js";
+import { isJsonValue } from "./isJsonValue.js";
 
-export function generateKeyPair() {
-  const { privateKey, publicKey } = generateKeyPairSync("rsa", {
-    modulusLength: 2048
-  });
+export async function signPayload(payload: any, privateKeyPem: string, publicKeyPem: string) {
+  if ( !isJsonValue(payload) ) throw new Error("signPayload only accepts JSON-compatible values");
 
-  return {
-    privateKey: privateKey.export({ type: "pkcs1", format: "pem" }),
-    publicKey: publicKey.export({ type: "spki", format: "pem" })
-  };
-}
-
-export function signPayload(payload: any, privateKeyPem: string, publicKeyPem: string) {
   const canonical = canonicalize(payload);
-  const bytes = Buffer.from(canonical, "utf8");
-
-  const signer = createSign("RSA-SHA256");
-  signer.update(bytes);
-  signer.end();
-
-  const signature = signer.sign({
-    key: privateKeyPem,
-    padding: constants.RSA_PKCS1_PSS_PADDING,
-    saltLength: 32
-  }).toString("base64");
+  const privateKey = await importPrivateKey(privateKeyPem);
+  const signatureBytes = await signCanonical(canonical, privateKey);
+  const signature = arrayBufferToBase64(signatureBytes);
 
   return {
     version: 1,
