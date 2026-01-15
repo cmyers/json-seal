@@ -1,11 +1,18 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { signPayload } from "../src/sign";
 import { verifyBackup } from "../src/verify";
-import { generateKeyPair } from "../src/sign";
 import { canonicalize } from "../src/canonicalize";
+import { generateKeyPair } from "../src/keys";
 
 describe("json-seal", () => {
-  const { privateKey, publicKey } = generateKeyPair();
+  let privateKey: string;
+  let publicKey: string;
+
+  beforeAll(async () => {
+    const keys = await generateKeyPair();
+    privateKey = keys.privateKey;
+    publicKey = keys.publicKey;
+  });
 
   const payload = {
     id: 1,
@@ -13,43 +20,46 @@ describe("json-seal", () => {
     nested: { score: 42, tags: ["a", "b", "c"] }
   };
 
-  it("signs and verifies a valid payload", () => {
-    const backup = signPayload(payload, privateKey, publicKey);
-    const result = verifyBackup(backup);
+  it("signs and verifies a valid payload", async () => {
+    const backup = await signPayload(payload, privateKey, publicKey);
+    const result = await verifyBackup(backup);
     expect(result.valid).toBe(true);
   });
 
-  it("detects shallow tampering", () => {
-    const backup = signPayload(payload, privateKey, publicKey);
-    const tampered = { ...backup, payload: { ...backup.payload, data: "hacked" } };
-    expect(verifyBackup(tampered).valid).toBe(false);
+  it("detects shallow tampering", async () => {
+    const backup = await signPayload(payload, privateKey, publicKey);
+    const tampered = {
+      ...backup,
+      payload: { ...(backup.payload as Record<string, any>), data: "hacked" }
+    };
+    expect((await verifyBackup(tampered)).valid).toBe(false);
   });
 
-  it("detects deep tampering", () => {
-    const backup = signPayload(payload, privateKey, publicKey);
+  it("detects deep tampering", async () => {
+    const backup = await signPayload(payload, privateKey, publicKey);
     const tampered = structuredClone(backup);
-    tampered.payload.nested.score = 999;
-    expect(verifyBackup(tampered).valid).toBe(false);
+    (tampered.payload as { nested: { score: number } }).nested.score = 999;
+    expect((await verifyBackup(tampered)).valid).toBe(false);
   });
 
-  it("fails when signature is missing", () => {
-    const backup = signPayload(payload, privateKey, publicKey);
+  it("fails when signature is missing", async () => {
+    const backup = await signPayload(payload, privateKey, publicKey);
     const missing = structuredClone(backup);
     delete (missing as any).signature;
-    expect(() => verifyBackup(missing)).toThrow();
+    await expect(() => verifyBackup(missing)).rejects.toThrow();
   });
 
-  it("fails with wrong public key", () => {
-    const backup = signPayload(payload, privateKey, publicKey);
-    const wrong = generateKeyPair();
+  it("fails with wrong public key", async () => {
+    const backup = await signPayload(payload, privateKey, publicKey);
+    const wrong = await generateKeyPair();
     backup.signature.publicKey = wrong.publicKey;
-    expect(verifyBackup(backup).valid).toBe(false);
+    expect((await verifyBackup(backup)).valid).toBe(false);
   });
 
-  it("fails with corrupted signature", () => {
-    const backup = signPayload(payload, privateKey, publicKey);
+  it("fails with corrupted signature", async () => {
+    const backup = await signPayload(payload, privateKey, publicKey);
     backup.signature.value = "AAAA" + backup.signature.value.slice(4);
-    expect(verifyBackup(backup).valid).toBe(false);
+    expect((await verifyBackup(backup)).valid).toBe(false);
   });
 
   it("canonicalization is stable", () => {
@@ -64,24 +74,24 @@ describe("json-seal", () => {
     expect(parsed).toEqual(payload);
   });
 
-  it("supports number payloads", () => {
-    const backup = signPayload(12345, privateKey, publicKey);
-    expect(verifyBackup(backup).valid).toBe(true);
+  it("supports number payloads", async () => {
+    const backup = await signPayload(12345, privateKey, publicKey);
+    expect((await verifyBackup(backup)).valid).toBe(true);
   });
 
-  it("supports array payloads", () => {
-    const backup = signPayload([1, 2, 3], privateKey, publicKey);
-    expect(verifyBackup(backup).valid).toBe(true);
+  it("supports array payloads", async () => {
+    const backup = await signPayload([1, 2, 3], privateKey, publicKey);
+    expect((await verifyBackup(backup)).valid).toBe(true);
   });
 
-  it("supports large payloads", () => {
-    const backup = signPayload({ big: "x".repeat(50000) }, privateKey, publicKey);
-    expect(verifyBackup(backup).valid).toBe(true);
+  it("supports large payloads", async () => {
+    const backup = await signPayload({ big: "x".repeat(50000) }, privateKey, publicKey);
+    expect((await verifyBackup(backup)).valid).toBe(true);
   });
 
-  it("RSA-PSS signatures are non-deterministic", () => {
-    const a = signPayload(payload, privateKey, publicKey);
-    const b = signPayload(payload, privateKey, publicKey);
+  it("RSA-PSS signatures are non-deterministic", async () => {
+    const a = await signPayload(payload, privateKey, publicKey);
+    const b = await signPayload(payload, privateKey, publicKey);
     expect(a.signature.value).not.toBe(b.signature.value);
   });
 });

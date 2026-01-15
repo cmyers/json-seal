@@ -1,5 +1,3 @@
-# **📘 Refined README (with JSON‑compatibility clarity)**
-
 <h1 align="center">json-seal</h1>
 
 <p align="center">
@@ -99,11 +97,15 @@ Everything needed for verification is embedded:
 - signature  
 - public key  
 
-### **Works Everywhere**
+### **Works with any JavaScript platform**
 Browsers, PWAs, Node 18+, Bun, Deno, and mobile runtimes.
 
+### **Interoperability**
+json‑seal follows the WebCrypto RSA‑PSS specification (SHA‑256, saltLength = 32).
+Environments built directly on OpenSSL defaults may not verify signatures unless configured to match WebCrypto’s parameters
+
 ### **Zero Dependencies**
-Small, auditable, and safe for long‑term use.
+Uses the built‑in WebCrypto API (no polyfills, no external crypto libraries). Small, auditable, and safe for long‑term use.
 
 ---
 

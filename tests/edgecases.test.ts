@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import { canonicalize } from "../src/canonicalize";
 import { signPayload } from "../src/sign";
 import { verifyBackup } from "../src/verify";
-import { generateKeyPair } from "../src/sign";
+import { generateKeyPair } from "../src/keys";
 
-describe("json-seal edge cases", () => {
-    const { privateKey, publicKey } = generateKeyPair();
+describe("json-seal edge cases", async () => {
+    const { privateKey, publicKey } = await generateKeyPair();
 
     // --- Unicode --------------------------------------------------------------
 
@@ -107,7 +107,7 @@ describe("json-seal edge cases", () => {
 
     // --- Signing round-trip ---------------------------------------------------
 
-    it("signs and verifies edge-case payloads", () => {
+    it("signs and verifies edge-case payloads", async () => {
         const payload = {
             emoji: "🔥",
             weird: "e\u0301",
@@ -116,8 +116,8 @@ describe("json-seal edge cases", () => {
             nested: [{}, [], null, "x"]
         };
 
-        const backup = signPayload(payload, privateKey, publicKey);
-        const result = verifyBackup(backup);
+        const backup = await signPayload(payload, privateKey, publicKey);
+        const result = await verifyBackup(backup);
 
         expect(result.valid).toBe(true);
     });
