@@ -58,6 +58,12 @@ describe("json-seal", () => {
     expect(canonicalize(a)).toBe(canonicalize(b));
   });
 
+  it("canonicalized JSON can be parsed back to the same structure", () => {
+    const canonical = canonicalize(payload);
+    const parsed = JSON.parse(canonical);
+    expect(parsed).toEqual(payload);
+  });
+
   it("supports number payloads", () => {
     const backup = signPayload(12345, privateKey, publicKey);
     expect(verifyBackup(backup).valid).toBe(true);
