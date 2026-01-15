@@ -1,6 +1,7 @@
 {
   "name": "json-seal",
-  "version": "0.10.1",
+  "version": "0.10.2",
+  "author": "Chris Myers <cmyers2015@outlook.com> (https://www.npmjs.com/~cmyers-dev)",
   "description": "Create cryptographically signed, tamper‑proof JSON backups with zero dependencies.",
   "type": "module",
   "main": "./dist/index.js",

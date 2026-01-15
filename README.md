@@ -1,3 +1,5 @@
+# **📘 Refined README (with JSON‑compatibility clarity)**
+
 <h1 align="center">json-seal</h1>
 
 <p align="center">
@@ -14,6 +16,8 @@
   A lightweight, zero‑dependency library for creating cryptographically signed, tamper‑proof JSON backups.
 </h3>
 
+---
+
 ## **Why json‑seal**
 
 Apps often need to store or transmit JSON in a way that guarantees it hasn’t been tampered with — without relying on servers, tokens, or opaque binary formats. Most security libraries focus on encrypted blobs, authentication tokens, or low‑level crypto primitives, but none solve the simple problem:
@@ -22,13 +26,53 @@ Apps often need to store or transmit JSON in a way that guarantees it hasn’t b
 
 json‑seal fills that gap. It lets you:
 
-- Canonicalize any JSON value  
+- Canonicalise any **JSON‑compatible JavaScript value** into deterministic JSON text  
 - Sign it with a private key  
 - Embed the public key  
 - Verify integrity later  
 - Detect any tampering — even a single character  
 
-It’s like JWS, but for **arbitrary JSON documents**, without JWT complexity, and designed for **offline‑first apps**, **local backups**, and **portable integrity checks**. It turns any JSON value into a **portable, human‑readable, cryptographically signed artifact** that can be verified anywhere, on any device, with no external dependencies.
+It’s like JWS, but for **arbitrary JSON documents**, without JWT complexity, and designed for **offline‑first apps**, **local backups**, and **portable integrity checks**.
+
+---
+
+## **What json‑seal accepts**
+
+`signPayload()` accepts any **JSON‑compatible JavaScript value**, including:
+
+- objects  
+- arrays  
+- strings  
+- numbers  
+- booleans  
+- null  
+
+Typed TypeScript interfaces work automatically as long as their fields are JSON‑compatible.
+
+### **Rejected values**
+
+json‑seal **does not** accept values that cannot appear in JSON:
+
+- `undefined`  
+- functions  
+- class instances  
+- Dates  
+- Maps / Sets  
+- Symbols  
+- BigInts  
+- circular references  
+- objects containing unsupported values  
+
+These are rejected at runtime with a clear error.
+
+### **Important**
+
+json‑seal signs **values**, not JSON text.
+
+```ts
+signPayload('{"a":1}') // ❌ signs the string literally
+signPayload({ a: 1 })  // ✔ signs the object
+```
 
 ---
 
@@ -127,7 +171,7 @@ if (result.valid) {
 Any modification — even deep inside nested objects — invalidates the signature.
 
 ```ts
-const tampered = { ...backup, payload: { id: 1, data: "hacked" } };
+const tampered = { ...backup, payload: { id: 1, data: "modified" } };
 
 verifyBackup(tampered).valid; // false
 ```
@@ -140,7 +184,8 @@ verifyBackup(tampered).valid; // false
 Generates a 2048‑bit RSA‑PSS keypair.
 
 ### **`signPayload(payload, privateKey, publicKey)`**  
-Canonicalizes the payload, signs it, and returns a sealed backup object.
+Canonicalizes the payload, signs it, and returns a sealed backup object.  
+The payload must be **JSON‑compatible** (see “What json‑seal accepts”).
 
 ### **`verifyBackup(backup)`**  
 Verifies the signature and returns `{ valid, payload? }`.
@@ -154,7 +199,7 @@ Full RFC 8785 Canonical JSON implementation.
 
 json‑seal builds on ideas from:
 
-- **json-canonicalize** — RFC 8785 canonicalization (no signing or backup format)  
+- **json-canonicalize** — RFC 8785 canonicalization  
 - **rfc8785 (Python)** — pure Python canonicalizer  
 - **jcs (Elixir)** — Elixir implementation of JCS  
 - **JOSE / JWS / JWT** — signing standards focused on tokens, not arbitrary JSON  
@@ -183,7 +228,9 @@ npm test
 ```
 
 ---
+
 Pull Requests are welcome.
+
 ## **License**
 
 MIT
