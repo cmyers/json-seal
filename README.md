@@ -28,9 +28,9 @@ json‑seal fills that gap. It lets you:
 - Sign it with a private key  
 - Embed the public key  
 - Verify integrity later  
-- Detect any tampering — even a single character  
+- Detect any tampering
 
-It’s like JWS, but for **arbitrary JSON documents**, without JWT complexity, and designed for **offline‑first apps**, **local backups**, and **portable integrity checks**.
+It’s built for **offline‑first apps**, **local backups**, and **portable integrity checks**, where JSON must remain human‑readable and self‑verifying.
 
 ---
 
@@ -197,16 +197,41 @@ Full RFC 8785 Canonical JSON implementation.
 
 ---
 
-## **Prior Art**
+## Prior Art
 
-json‑seal builds on ideas from:
+### JSON Web Signature (JWS)
 
-- **json-canonicalize** — RFC 8785 canonicalization  
-- **rfc8785 (Python)** — pure Python canonicalizer  
-- **jcs (Elixir)** — Elixir implementation of JCS  
-- **JOSE / JWS / JWT** — signing standards focused on tokens, not arbitrary JSON  
+JWS is the established IETF standard for signing JSON‑related data, but it solves a very different problem. JWS is designed for **token exchange between untrusted parties** (OAuth, OpenID Connect, identity providers), not for **deterministic, portable, tamper‑evident JSON objects**.
 
-json‑seal combines **canonicalization + signing + verification** into a single, zero‑dependency library designed for **offline‑first, portable JSON integrity**.
+Key differences:
+
+- **JWS signs bytes, not JSON**  
+  The payload must be base64url‑encoded. Two equivalent JSON objects can produce different signatures.
+
+- **No canonicalization**  
+  JWS does not define how JSON should be normalized. json‑seal uses deterministic canonicalization so the same logical object always produces the same signature.
+
+- **Heavy structural overhead**  
+  Protected headers, unprotected headers, algorithm identifiers, key IDs, and two serialization formats (compact and JSON).
+
+- **Not offline‑first**  
+  JWS is built for network protocols. json‑seal is built for sealed backups, hash chains, and local integrity.
+
+- **Not WebView‑friendly**  
+  Most JOSE libraries depend on Node’s crypto module. json‑seal uses WebCrypto and works in browsers, Ionic, Capacitor, and mobile WebViews.
+
+### In contrast
+
+json‑seal focuses on a simpler, narrower goal:
+
+- **Pure JSON in, pure JSON out**  
+- **Deterministic canonicalization**  
+- **WebCrypto‑based RSA‑PSS signatures**  
+- **Self‑contained sealed objects with embedded public keys**  
+- **Zero dependencies**  
+- **Portable across browsers, Node, Deno, Bun, and hybrid mobile apps**  
+
+It’s not a replacement for JWS — it’s a lightweight alternative for cases where you simply need to **seal JSON and verify it later**, without the complexity of JOSE.
 
 ---
 
@@ -228,7 +253,6 @@ Run tests:
 ```bash
 npm test
 ```
-
 ---
 
 Pull Requests are welcome.
