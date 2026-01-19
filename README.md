@@ -45,7 +45,7 @@ It’s built for **offline‑first apps**, **local backups**, and **portable int
 - booleans  
 - null  
 
-Typed TypeScript interfaces work automatically as long as their fields are JSON‑compatible.
+TypeScript interfaces work automatically as long as their fields are JSON‑compatible.
 
 ### **Rejected values**
 
