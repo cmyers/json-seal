@@ -18,9 +18,9 @@
 
 ## **Why json‑seal**
 
-Apps often need to store or transmit JSON in a way that guarantees it hasn’t been tampered with — without relying on servers, tokens, or opaque binary formats. Most security libraries focus on encrypted blobs, authentication tokens, or low‑level crypto primitives, but none solve the simple problem:
+Apps often need to store or transmit JSON in a way that guarantees it hasn’t been tampered with - without relying on servers, tokens, or opaque binary formats. Most security libraries focus on encrypted blobs, authentication tokens, or low‑level crypto primitives, but none solve the simple problem:
 
-**“I need to store JSON in a way that guarantees integrity — while keeping it readable, portable, and framework‑agnostic.”**
+**“I need to store JSON in a way that guarantees integrity - while keeping it readable, portable, and framework‑agnostic.”**
 
 json‑seal fills that gap. It lets you:
 
@@ -170,7 +170,7 @@ if (result.valid) {
 
 ## **Tamper Detection**
 
-Any modification — even deep inside nested objects — invalidates the signature.
+Any modification - even deep inside nested objects - invalidates the signature.
 
 ```ts
 const tampered = { ...backup, payload: { id: 1, data: "modified" } };
@@ -231,7 +231,7 @@ json‑seal focuses on a simpler, narrower goal:
 - **Zero dependencies**  
 - **Portable across browsers, Node, Deno, Bun, and hybrid mobile apps**  
 
-It’s not a replacement for JWS — it’s a lightweight alternative for cases where you simply need to **seal JSON and verify it later**, without the complexity of JOSE.
+It’s not a replacement for JWS - it’s a lightweight alternative for cases where you simply need to **seal JSON and verify it later**, without the complexity of JOSE.
 
 ---
 
