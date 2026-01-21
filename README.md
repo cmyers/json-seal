@@ -6,7 +6,6 @@
   <img src="https://img.shields.io/badge/Deterministic%20JSON-RFC%208785%20Compliant-success" alt="Deterministic JSON" />
   <img src="https://img.shields.io/badge/dependencies-0-brightgreen" alt="dependencies" />
   <img src="https://img.shields.io/badge/types-TypeScript-blue" alt="types" />
-  <img src="https://img.shields.io/bundlephobia/minzip/json-seal" alt="bundle size" />
   <img src="https://img.shields.io/github/license/cmyers/json-seal" alt="license" />
 </p>
 
