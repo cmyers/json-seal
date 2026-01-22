@@ -25,10 +25,31 @@ export function canonicalize(value: any): string {
 /* -------------------------------------------------------------------------- */
 
 function escapeString(str: string): string {
-  // RFC 8785 uses ECMAScript string escaping rules.
+  // RFC 8785 defines canonicalization in terms of ECMAScript strings (UTF‑16),
+  // but the final canonical form must be encoded as UTF‑8 when serialized.
+  // Therefore we validate UTF‑16 correctness (surrogate pairs) here.
   let out = '"';
   for (let i = 0; i < str.length; i++) {
     const c = str.charCodeAt(i);
+
+    // Surrogate handling (UTF‑16 correctness)
+    if (c >= 0xd800 && c <= 0xdbff) {
+      // High surrogate: must be followed by a low surrogate
+      if (i + 1 >= str.length) {
+        throw new Error("Invalid UTF‑16: isolated high surrogate");
+      }
+      const d = str.charCodeAt(i + 1);
+      if (d < 0xdc00 || d > 0xdfff) {
+        throw new Error("Invalid UTF‑16: high surrogate not followed by low surrogate");
+      }
+      // Valid surrogate pair → append both as-is
+      out += str[i] + str[i + 1];
+      i++; // skip the low surrogate
+      continue;
+    } else if (c >= 0xdc00 && c <= 0xdfff) {
+      // Low surrogate without preceding high surrogate
+      throw new Error("Invalid UTF‑16: isolated low surrogate");
+    }
 
     switch (c) {
       case 0x22: out += '\\"'; break; // "
@@ -67,22 +88,25 @@ function serializeNumber(n: number): string {
   // RFC 8785: -0 must be serialized as 0
   if (Object.is(n, -0)) return "0";
 
-  // Use JS number → string, then normalize exponent form
+  // Use JS number → string, then normalize exponent form if present.
+  // JS already produces minimal mantissa/decimal representation.
   let s = n.toString();
 
-  // Normalize exponent to uppercase E
-  if (s.includes("e")) {
-    const [mantissa, exp] = s.split("e");
-    const sign = exp.startsWith("-") ? "-" : "+";
-    let digits = exp.replace(/^[+-]/, "");
+  // Normalize exponent to RFC 8785 rules
+  const eIndex = s.indexOf("e");
+  if (eIndex !== -1) {
+    const mantissa = s.slice(0, eIndex);
+    let exp = s.slice(eIndex + 1); // after 'e'
+
+    const negative = exp.startsWith("-");
+    exp = exp.replace(/^[+-]/, "");
 
     // Remove leading zeros in exponent
-    digits = digits.replace(/^0+/, "");
-    if (digits === "") digits = "0";
+    exp = exp.replace(/^0+/, "");
+    if (exp === "") exp = "0";
 
     // RFC 8785: exponent must not include "+"
-    const normalized = `${mantissa}E${sign === "-" ? "-" : ""}${digits}`;
-    return normalized;
+    s = `${mantissa}E${negative ? "-" : ""}${exp}`;
   }
 
   return s;
@@ -107,10 +131,12 @@ function serializeObject(obj: Record<string, any>): string {
   // RFC 8785: duplicate keys MUST be rejected
   detectDuplicateKeys(keys);
 
-  // Sort by UTF‑16 code units (JS default)
+  // Sort by UTF‑16 code units (JS default), as required by RFC 8785
   keys.sort();
 
-  const entries = keys.map(k => `${escapeString(k)}:${canonicalize(obj[k])}`);
+  const entries = keys.map(
+    (k) => `${escapeString(k)}:${canonicalize(obj[k])}`
+  );
   return `{${entries.join(",")}}`;
 }
 
