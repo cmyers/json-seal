@@ -78,3 +78,9 @@ a {
 a:hover {
   opacity: 1;
 }
+
+.external-links {
+  text-align: center;
+  margin-top: 2rem;
+  opacity: 0.8;
+}
