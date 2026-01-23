@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>json‑seal — Key Management</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main>
+    <h1>Key Management</h1>
+
+    <p>
+      json‑seal uses RSA‑PSS keys for signing and verifying sealed envelopes.
+      The private key is used to create signatures. The public key is embedded
+      directly in each envelope, making verification portable and self‑contained.
+    </p>
+
+    <h2>Generating keys</h2>
+    <p>
+      Keys are created using the WebCrypto API. json‑seal provides a helper
+      that returns a ready‑to‑use RSA‑PSS key pair.
+    </p>
+
+    <pre><code>import { generateKeyPair } from "json-seal";
+
+const { publicKey, privateKey } = await generateKeyPair();
+</code></pre>
+
+    <h2>Exporting keys</h2>
+    <p>
+      Keys can be exported for storage or transport. Private keys should be
+      protected; public keys may be shared freely.
+    </p>
+
+    <pre><code>const pub = await crypto.subtle.exportKey("spki", publicKey);
+const priv = await crypto.subtle.exportKey("pkcs8", privateKey);
+</code></pre>
+
+    <h2>Importing keys</h2>
+    <p>
+      Exported keys can be re‑imported into WebCrypto when needed.
+    </p>
+
+    <pre><code>const publicKey = await crypto.subtle.importKey(
+  "spki",
+  pub,
+  { name: "RSA-PSS", hash: "SHA-256" },
+  true,
+  ["verify"]
+);
+</code></pre>
+
+    <h2>Storing private keys</h2>
+    <p>
+      Private keys must be stored securely. Recommended options include:
+    </p>
+
+    <ul>
+      <li>browser: IndexedDB with appropriate access controls</li>
+      <li>Node: filesystem with restricted permissions</li>
+      <li>native apps: secure storage APIs</li>
+      <li>servers: environment‑specific secret management</li>
+    </ul>
+
+    <p>
+      json‑seal does not prescribe a storage strategy. It leaves key
+      management to the host environment.
+    </p>
+
+    <h2>Key rotation</h2>
+    <p>
+      Each sealed envelope embeds its own public key. This means:
+    </p>
+
+    <ul>
+      <li>old envelopes remain verifiable indefinitely</li>
+      <li>new envelopes can be sealed with new keys at any time</li>
+      <li>rotation does not break existing data</li>
+    </ul>
+
+    <p>
+      Rotation is as simple as generating a new key pair and sealing with it.
+    </p>
+
+    <h2>Trust model</h2>
+    <p>
+      Verification trusts the embedded public key. If you need stronger
+      guarantees—such as identity binding, certificate chains, or external
+      trust anchors—those must be layered on top of json‑seal.
+    </p>
+
+    <h2>What json‑seal does not do</h2>
+    <ul>
+      <li>does not store keys</li>
+      <li>does not manage trust relationships</li>
+      <li>does not provide encryption or confidentiality</li>
+      <li>does not provide revocation</li>
+    </ul>
+
+    <p>
+      json‑seal focuses on one thing: producing and verifying signed,
+      tamper‑evident JSON envelopes. Key management remains under your control.
+    </p>
+
+    <p><a href="index.html">← Back</a></p>
+  </main>
+</body>
+</html>

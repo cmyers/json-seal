@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>json‑seal — API</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main>
+    <h1>API Reference</h1>
+
+    <p>
+      json‑seal exposes a small, explicit API for generating signing keys,
+      sealing JSON values, and verifying signed envelopes. All operations use
+      the RFC 8785 JSON Canonicalization Scheme and RSA‑PSS signatures.
+    </p>
+
+    <!-- generateKeyPair -->
+    <h2>generateKeyPair()</h2>
+    <p>
+      Generates a new RSA‑PSS key pair suitable for sealing and verifying
+      JSON envelopes. Keys are returned as WebCrypto <code>CryptoKey</code> objects.
+    </p>
+
+    <pre><code>import { generateKeyPair } from "json-seal";
+
+const { publicKey, privateKey } = await generateKeyPair();
+</code></pre>
+
+    <h3>Returns</h3>
+    <ul>
+      <li><strong>publicKey</strong> — RSA‑PSS public key</li>
+      <li><strong>privateKey</strong> — RSA‑PSS private key</li>
+    </ul>
+
+    <!-- seal -->
+    <h2>seal(value, privateKey)</h2>
+    <p>
+      Canonicalizes the value using the RFC 8785 JSON Canonicalization Scheme,
+      hashes it with SHA‑256, and signs the digest using RSA‑PSS. The result is a
+      tamper‑evident, self‑verifying JSON envelope.
+    </p>
+
+    <pre><code>import { seal } from "json-seal";
+
+const sealed = await seal({ message: "hello" }, privateKey);
+</code></pre>
+
+    <h3>Parameters</h3>
+    <ul>
+      <li><strong>value</strong> — any JSON‑serializable value</li>
+      <li><strong>privateKey</strong> — RSA‑PSS private key used to sign</li>
+    </ul>
+
+    <h3>Returns</h3>
+    <p>
+      A sealed JSON envelope containing the payload, a timestamp, the RSA‑PSS
+      signature, and the embedded public key. Canonicalization and hashing are
+      performed internally and are not stored in the envelope.
+    </p>
+
+    <!-- verify -->
+    <h2>verify(sealed)</h2>
+    <p>
+      Verifies the authenticity and integrity of a sealed envelope. The
+      embedded public key is used to validate the RSA‑PSS signature.
+    </p>
+
+    <pre><code>import { verify } from "json-seal";
+
+const result = await verify(sealed);
+
+if (result.ok) {
+  console.log("Authentic:", result.value);
+} else {
+  console.error("Verification failed:", result.reason);
+}
+</code></pre>
+
+    <h3>Returns</h3>
+    <ul>
+      <li><strong>ok</strong> — boolean indicating authenticity</li>
+      <li><strong>value</strong> — the original value (if authentic)</li>
+      <li><strong>reason</strong> — explanation for verification failure</li>
+    </ul>
+
+    <!-- canonicalize -->
+    <h2>canonicalize(value)</h2>
+    <p>
+      Converts a JavaScript value into a deterministic canonical representation
+      using the RFC 8785 JSON Canonicalization Scheme. Used internally by
+      <code>seal</code> and <code>verify</code>.
+    </p>
+
+    <pre><code>import { canonicalize } from "json-seal";
+
+const text = canonicalize({ b: 2, a: 1 });
+// {"a":1,"b":2}
+</code></pre>
+
+    <p><a href="index.html">← Back</a></p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>json‑seal — Formats</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main>
+    <h1>Envelope Format</h1>
+
+    <p>
+      json‑seal produces a portable, self‑verifying JSON envelope. Each sealed
+      document contains the payload, a timestamp, and an RSA‑PSS signature with
+      the embedded public key required for verification. The payload is
+      canonicalized using the RFC 8785 JSON Canonicalization Scheme and hashed
+      with SHA‑256 during signing.
+    </p>
+
+    <h2>Structure</h2>
+    <p>The sealed envelope has the following shape:</p>
+
+    <pre><code>{
+  "version": 1,
+  "timestamp": "2026-01-11T18:24:55.402Z",
+
+  "payload": {
+    "id": 1,
+    "message": "hello"
+  },
+
+  "signature": {
+    "algorithm": "RSA-PSS-SHA256",
+    "publicKey": "-----BEGIN PUBLIC KEY----- ...",
+    "value": "base64-signature"
+  }
+}
+</code></pre>
+
+    <h2>Fields</h2>
+
+    <h3>version</h3>
+    <p>
+      Identifies the envelope format version. This changes only if the envelope
+      structure or canonicalization rules evolve.
+    </p>
+
+    <h3>timestamp</h3>
+    <p>
+      ISO‑8601 timestamp indicating when the envelope was sealed.
+    </p>
+
+    <h3>payload</h3>
+    <p>
+      The original JavaScript value provided to <code>seal()</code>. It is
+      canonicalized using RFC 8785 before hashing and signing.
+    </p>
+
+    <h3>signature</h3>
+    <p>
+      Contains the RSA‑PSS signature over the SHA‑256 digest of the canonical
+      payload, along with the embedded public key required for verification.
+      The canonical form and digest are not stored; they are derived during
+      sealing and verification.
+    </p>
+
+    <h2>Stability</h2>
+    <ul>
+      <li>The envelope format is stable and versioned.</li>
+      <li>RFC 8785 canonicalization ensures deterministic behavior across environments.</li>
+      <li>Signatures remain valid as long as the embedded public key is trusted.</li>
+    </ul>
+
+    <p><a href="index.html">← Back</a></p>
+  </main>
+</body>
+</html>

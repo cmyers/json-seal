@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>json‑seal — Usage</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main>
+    <h1>Usage</h1>
+
+    <p>
+      json‑seal exposes two primary operations:
+      <strong>seal</strong> and <strong>verify</strong>, along with a helper
+      for generating signing keys.
+    </p>
+
+    <h2>1. Generate a key pair</h2>
+    <p>
+      Sealing requires an RSA‑PSS private key. Verification uses the embedded
+      public key.
+    </p>
+
+    <pre><code>import { generateKeyPair } from "json-seal";
+
+const { publicKey, privateKey } = await generateKeyPair();
+</code></pre>
+
+    <h2>2. Sealing a value</h2>
+    <p>
+      Seal any JSON‑serializable value into a signed, tamper‑evident envelope.
+      The envelope includes the payload, a timestamp, the RSA‑PSS signature,
+      and the embedded public key. The payload is canonicalized using the
+      RFC 8785 JSON Canonicalization Scheme and hashed with SHA‑256 during
+      sealing.
+    </p>
+
+    <pre><code>import { seal } from "json-seal";
+
+const sealed = await seal(
+  { user: "chris", role: "admin" },
+  privateKey
+);
+
+// persist or transmit `sealed`
+</code></pre>
+
+    <h2>3. Verifying a sealed value</h2>
+    <p>
+      Verification re‑canonicalizes the payload using RFC 8785, recomputes the
+      SHA‑256 digest, and validates the RSA‑PSS signature using the embedded
+      public key.
+    </p>
+
+    <pre><code>import { verify } from "json-seal";
+
+const result = await verify(sealed);
+
+if (result.ok) {
+  console.log("Document is authentic");
+  console.log(result.value); // original value
+} else {
+  console.error("Verification failed");
+  console.error(result.reason);
+}
+</code></pre>
+
+    <h2>Error handling</h2>
+    <p>
+      Verification failures are returned through the result object rather than
+      thrown, allowing you to route failures explicitly.
+    </p>
+
+    <p><a href="index.html">← Back</a></p>
+  </main>
+</body>
+</html>
