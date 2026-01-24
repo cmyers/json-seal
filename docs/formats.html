@@ -15,8 +15,8 @@
       json‑seal produces a portable, self‑verifying JSON envelope. Each sealed
       document contains the payload, a timestamp, and an RSA‑PSS signature with
       the embedded public key required for verification. The payload is
-      canonicalized using the RFC 8785 JSON Canonicalization Scheme and hashed
-      with SHA‑256 during signing.
+      canonicalized using the RFC 8785 JSON Canonicalization Scheme and signed
+      using RSA‑PSS with SHA‑256.
     </p>
 
     <h2>Structure</h2>
@@ -54,16 +54,16 @@
 
     <h3>payload</h3>
     <p>
-      The original JavaScript value provided to <code>seal()</code>. It is
-      canonicalized using RFC 8785 before hashing and signing.
+      The original JavaScript value provided to <code>signPayload()</code>. It is
+      canonicalized using RFC 8785 before signing.
     </p>
 
     <h3>signature</h3>
     <p>
-      Contains the RSA‑PSS signature over the SHA‑256 digest of the canonical
-      payload, along with the embedded public key required for verification.
-      The canonical form and digest are not stored; they are derived during
-      sealing and verification.
+      Contains the RSA‑PSS signature over the canonicalized payload. SHA‑256
+      hashing is performed internally by the RSA‑PSS algorithm. The canonical
+      form and digest are not stored; they are derived during sealing and
+      verification.
     </p>
 
     <h2>Stability</h2>
