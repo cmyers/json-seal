@@ -13,13 +13,13 @@
 
     <p>
       json‑seal exposes two primary operations:
-      <strong>seal</strong> and <strong>verify</strong>, along with a helper
+      <strong>signPayload</strong> and <strong>verifyBackup</strong>, along with a helper
       for generating signing keys.
     </p>
 
     <h2>1. Generate a key pair</h2>
     <p>
-      Sealing requires an RSA‑PSS private key. Verification uses the embedded
+      Signing requires an RSA‑PSS private key. Verification uses the embedded
       public key.
     </p>
 
@@ -28,46 +28,45 @@
 const { publicKey, privateKey } = await generateKeyPair();
 </code></pre>
 
-    <h2>2. Sealing a value</h2>
+    <h2>2. Signing a value</h2>
     <p>
-      Seal any JSON‑serializable value into a signed, tamper‑evident envelope.
+      Sign any JSON‑serializable value into a tamper‑evident envelope.
       The envelope includes the original payload, a timestamp, the RSA‑PSS
       signature, and the embedded public key.
-
     </p>
     <p>
       Internally, the payload is canonicalized using the RFC 8785 JSON
-      Canonicalization Scheme and hashed with SHA‑256 before signing.
-
+      Canonicalization Scheme. The canonical bytes are then signed using
+      RSA‑PSS with SHA‑256.
     </p>
 
-    <pre><code>import { seal } from "json-seal";
+    <pre><code>import { signPayload } from "json-seal";
 
-const sealed = await seal(
+const sealed = await signPayload(
   { user: "chris", role: "admin" },
-  privateKey
+  privateKey,
+  publicKey
 );
 
 // persist or transmit `sealed`
 </code></pre>
 
-    <h2>3. Verifying a sealed value</h2>
+    <h2>3. Verifying a signed value</h2>
     <p>
-      Verification re‑canonicalizes the payload using RFC 8785, recomputes the
-      SHA‑256 digest, and validates the RSA‑PSS signature using the embedded
-      public key.
+      Verification re‑canonicalizes the payload using RFC 8785 and validates the
+      RSA‑PSS signature using the embedded public key. If the signature is valid,
+      the document is authentic and unmodified.
     </p>
 
-    <pre><code>import { verify } from "json-seal";
+    <pre><code>import { verifyBackup } from "json-seal";
 
-const result = await verify(sealed);
+const result = await verifyBackup(sealed);
 
-if (result.ok) {
+if (result.valid) {
   console.log("Document is authentic");
-  console.log(result.value); // original value
+  console.log(result.payload); // original value
 } else {
   console.error("Verification failed");
-  console.error(result.reason);
 }
 </code></pre>
 
