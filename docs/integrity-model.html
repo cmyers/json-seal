@@ -47,18 +47,18 @@
 
         <h2>Digital Signature</h2>
         <p>
-            json‑seal signs the digest using RSA‑PSS with SHA‑256. The signature
-            proves that the sealed document was created by whoever holds the
+            json‑seal signs the canonicalized payload using RSA‑PSS with SHA‑256.
+            SHA‑256 hashing is performed internally by the signature algorithm.
+            The signature proves that the sealed document was created by whoever holds the
             corresponding private key. The public key is embedded directly in the
             envelope, making verification portable and self‑contained.
         </p>
 
         <h2>Verification</h2>
         <p>
-            Verification re‑canonicalizes the payload, recomputes the SHA‑256
-            digest, and validates the RSA‑PSS signature using the embedded public
-            key. If the signature is valid, the document is authentic and
-            unmodified.
+            Verification re‑canonicalizes the payload and validates the RSA‑PSS signature
+            using the embedded public key. If the signature is valid, the document is
+            authentic and unmodified.
         </p>
 
         <h2>What is guaranteed</h2>
@@ -84,5 +84,4 @@
         <p><a href="index.html">← Back</a></p>
     </main>
 </body>
-
 </html>
