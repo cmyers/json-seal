@@ -40,9 +40,9 @@
 
         <h2>Digest</h2>
         <p>
-            The canonical form is hashed using SHA‑256. This digest is the exact
-            value that is signed. The digest is not stored in the envelope; it is
-            recomputed during verification.
+            The canonical form is signed using RSA‑PSS with SHA‑256. Internally, the canonical bytes are hashed with
+            SHA‑256 as part of the signature operation. The digest is not stored in the envelope; it is recomputed
+            implicitly during verification.
         </p>
 
         <h2>Digital Signature</h2>
