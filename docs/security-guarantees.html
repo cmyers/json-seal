@@ -36,7 +36,7 @@
     <h3>Deterministic behavior</h3>
     <p>
       RFC 8785 canonicalization ensures that semantically identical values always
-      produce the same digest and signature across environments.
+      produce the same canonical form and signature across environments.
     </p>
 
     <h3>Self‑contained verification</h3>
@@ -55,13 +55,13 @@
 
     <h3>No confidentiality</h3>
     <p>
-      Sealed values remain visible. json‑seal does not encrypt or hide data.
+      Signed values remain visible. json‑seal does not encrypt or hide data.
     </p>
 
     <h3>No access control</h3>
     <p>
       Anyone can verify an envelope. json‑seal does not restrict who can read or
-      validate sealed data.
+      validate signed data.
     </p>
 
     <h3>No identity binding</h3>
@@ -72,7 +72,7 @@
 
     <h3>No revocation</h3>
     <p>
-      Once an envelope is sealed, it remains valid as long as the public key is
+      Once an envelope is signed, it remains valid as long as the public key is
       trusted. json‑seal does not provide key revocation or expiration.
     </p>
 
