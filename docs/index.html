@@ -13,14 +13,17 @@
 
     <p>Lightweight, portable JSON data integrity - without the complexity.</p>
 
-    <pre><code>import { seal, verify } from "json-seal";
+    <pre><code>import { generateKeyPair, signPayload, verifyBackup } from "json-seal";
 
-const sealed = await seal({ message: "hello" });
-const result = await verify(sealed);</code></pre>
+const { publicKey, privateKey } = await generateKeyPair();
+
+const sealed = await signPayload({ message: "hello" }, privateKey, publicKey);
+const result = await verifyBackup(sealed);
+</code></pre>
 
     <p>
       json‑seal creates a cryptographically signed, tamper‑evident envelope
-      around any JSON‑serializable value. It uses the RFC 8785 JSON
+      around any JSON‑serializable value. It uses the RFC 8785 JSON
       Canonicalization Scheme and RSA‑PSS signatures to guarantee both
       integrity and authenticity.
     </p>
