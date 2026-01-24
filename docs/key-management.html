@@ -12,7 +12,7 @@
     <h1>Key Management</h1>
 
     <p>
-      json‑seal uses RSA‑PSS keys for signing and verifying sealed envelopes.
+      json‑seal uses RSA‑PSS keys for signing and verifying signed envelopes.
       The private key is used to create signatures. The public key is embedded
       directly in each envelope, making verification portable and self‑contained.
     </p>
@@ -71,17 +71,17 @@ const priv = await crypto.subtle.exportKey("pkcs8", privateKey);
 
     <h2>Key rotation</h2>
     <p>
-      Each sealed envelope embeds its own public key. This means:
+      Each signed envelope embeds its own public key. This means:
     </p>
 
     <ul>
       <li>old envelopes remain verifiable indefinitely</li>
-      <li>new envelopes can be sealed with new keys at any time</li>
+      <li>new envelopes can be signed with new keys at any time</li>
       <li>rotation does not break existing data</li>
     </ul>
 
     <p>
-      Rotation is as simple as generating a new key pair and sealing with it.
+      Rotation is as simple as generating a new key pair and signing with it.
     </p>
 
     <h2>Trust model</h2>
