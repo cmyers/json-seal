@@ -31,10 +31,14 @@ const { publicKey, privateKey } = await generateKeyPair();
     <h2>2. Sealing a value</h2>
     <p>
       Seal any JSON‑serializable value into a signed, tamper‑evident envelope.
-      The envelope includes the payload, a timestamp, the RSA‑PSS signature,
-      and the embedded public key. The payload is canonicalized using the
-      RFC 8785 JSON Canonicalization Scheme and hashed with SHA‑256 during
-      sealing.
+      The envelope includes the original payload, a timestamp, the RSA‑PSS
+      signature, and the embedded public key.
+
+    </p>
+    <p>
+      Internally, the payload is canonicalized using the RFC 8785 JSON
+      Canonicalization Scheme and hashed with SHA‑256 before signing.
+
     </p>
 
     <pre><code>import { seal } from "json-seal";

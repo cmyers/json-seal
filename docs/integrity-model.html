@@ -33,6 +33,10 @@
             values always produce the same canonical form and therefore the same
             signature. json‑seal canonicalizes JavaScript values, not raw JSON text.
         </p>
+        <p>
+            Canonicalization is required because JSON is not deterministic across platforms; without a stable
+            representation, signatures would not verify reliably between different runtimes.
+        </p>
 
         <h2>Digest</h2>
         <p>
