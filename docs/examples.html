@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -93,8 +94,8 @@ const sealedRecord = await signPayload(record, privateKey, publicKey);
 
     <h2>Using canonicalization directly</h2>
     <p>
-      Useful when you need deterministic JSON output for hashing or comparison.
-      json‑seal uses the RFC 8785 JSON Canonicalization Scheme.
+      Useful when you need deterministic JSON output for hashing or comparison. json‑seal implements the full RFC 8785
+      JSON Canonicalization Scheme.
     </p>
 
     <pre><code>import { canonicalize } from "json-seal";
@@ -106,4 +107,5 @@ const text = canonicalize({ b: 2, a: 1 });
     <p><a href="index.html">← Back</a></p>
   </main>
 </body>
+
 </html>
