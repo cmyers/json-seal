@@ -36,7 +36,11 @@ bun add json-seal
     <h2>Deno</h2>
     <p>Use the npm compatibility layer:</p>
 
-    <pre><code>import { seal, verify } from "npm:json-seal";
+    <pre><code>import {
+  generateKeyPair,
+  signPayload,
+  verifyBackup
+} from "npm:json-seal";
 </code></pre>
 
     <h2>Browser (no bundler)</h2>
@@ -51,8 +55,16 @@ bun add json-seal
 &lt;/script&gt;
 
 &lt;script type="module"&gt;
-  import { seal } from "json-seal";
-  // use json‑seal directly in the browser
+  import {
+    generateKeyPair,
+    signPayload,
+    verifyBackup
+  } from "json-seal";
+
+  const { publicKey, privateKey } = await generateKeyPair();
+
+  const sealed = await signPayload({ message: "hello" }, privateKey, publicKey);
+  const result = await verifyBackup(sealed);
 &lt;/script&gt;
 </code></pre>
 
