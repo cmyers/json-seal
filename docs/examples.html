@@ -23,7 +23,7 @@
       ensure configuration integrity.
     </p>
 
-    <pre><code>import { generateKeyPair, seal } from "json-seal";
+    <pre><code>import { generateKeyPair, signPayload } from "json-seal";
 
 const { publicKey, privateKey } = await generateKeyPair();
 
@@ -36,7 +36,7 @@ const prefs = {
   }
 };
 
-const sealed = await seal(prefs, privateKey);
+const sealed = await signPayload(prefs, privateKey, publicKey);
 // write `sealed` to disk
 </code></pre>
 
@@ -46,15 +46,15 @@ const sealed = await seal(prefs, privateKey);
       embedded public key.
     </p>
 
-    <pre><code>import { verify } from "json-seal";
+    <pre><code>import { verifyBackup } from "json-seal";
 
 // `sealed` loaded from disk or received over the network
-const result = await verify(sealed);
+const result = await verifyBackup(sealed);
 
-if (result.ok) {
-  console.log("Authentic:", result.value);
+if (result.valid) {
+  console.log("Authentic:", result.payload);
 } else {
-  console.error("Verification failed:", result.reason);
+  console.error("Verification failed");
 }
 </code></pre>
 
@@ -70,20 +70,21 @@ if (result.ok) {
   completed: false
 };
 
-const sealedRecord = await seal(record, privateKey);
+const sealedRecord = await signPayload(record, privateKey, publicKey);
 // sync `sealedRecord` to the server
 </code></pre>
 
     <h2>Embedding sealed data in a backup</h2>
     <p>
-      Backups remain verifiable anywhere they are restored, thanks to the embedded public key.
+      Backups remain verifiable anywhere they are restored, thanks to the
+      embedded public key.
     </p>
 
     <pre><code>const backup = {
   timestamp: Date.now(),
   items: [
-    await seal({ note: "hello" }, privateKey),
-    await seal({ note: "world" }, privateKey)
+    await signPayload({ note: "hello" }, privateKey, publicKey),
+    await signPayload({ note: "world" }, privateKey, publicKey)
   ]
 };
 
@@ -93,7 +94,7 @@ const sealedRecord = await seal(record, privateKey);
     <h2>Using canonicalization directly</h2>
     <p>
       Useful when you need deterministic JSON output for hashing or comparison.
-      json‑seal uses the RFC 8785 JSON Canonicalization Scheme.
+      json‑seal uses the RFC 8785 JSON Canonicalization Scheme.
     </p>
 
     <pre><code>import { canonicalize } from "json-seal";
