@@ -13,15 +13,17 @@
 
     <p>
       json‑seal exposes a small, explicit API for generating signing keys,
-      sealing JSON values, and verifying signed envelopes. All operations use
-      the RFC 8785 JSON Canonicalization Scheme and RSA‑PSS signatures.
+      canonicalizing values, sealing payloads, and verifying signed envelopes.
+      All operations use the RFC 8785 JSON Canonicalization Scheme and RSA‑PSS
+      signatures.
     </p>
 
     <!-- generateKeyPair -->
     <h2>generateKeyPair()</h2>
     <p>
-      Generates a new RSA‑PSS key pair suitable for sealing and verifying
-      JSON envelopes. Keys are returned as WebCrypto <code>CryptoKey</code> objects.
+      Generates a new RSA‑PSS key pair suitable for signing and verifying
+      JSON envelopes. Keys are returned as WebCrypto <code>CryptoKey</code>
+      objects.
     </p>
 
     <pre><code>import { generateKeyPair } from "json-seal";
@@ -35,63 +37,73 @@ const { publicKey, privateKey } = await generateKeyPair();
       <li><strong>privateKey</strong> — RSA‑PSS private key</li>
     </ul>
 
-    <!-- seal -->
-    <h2>seal(value, privateKey)</h2>
+    <!-- signPayload -->
+    <h2>signPayload(value, privateKey, publicKey)</h2>
     <p>
-      Canonicalizes the value using the RFC 8785 JSON Canonicalization Scheme,
-      hashes it with SHA‑256, and signs the digest using RSA‑PSS. The result is a
-      tamper‑evident, self‑verifying JSON envelope.
+      Canonicalizes the value using RFC 8785 and signs it using RSA‑PSS with
+      SHA‑256. Returns a sealed JSON envelope containing the original payload,
+      a timestamp, the signature, and the embedded public key.
     </p>
 
-    <pre><code>import { seal } from "json-seal";
+    <pre><code>import { signPayload } from "json-seal";
 
-const sealed = await seal({ message: "hello" }, privateKey);
+const sealed = await signPayload(
+  { message: "hello" },
+  privateKey,
+  publicKey
+);
 </code></pre>
 
     <h3>Parameters</h3>
     <ul>
       <li><strong>value</strong> — any JSON‑serializable value</li>
       <li><strong>privateKey</strong> — RSA‑PSS private key used to sign</li>
+      <li><strong>publicKey</strong> — RSA‑PSS public key to embed in the envelope</li>
     </ul>
 
     <h3>Returns</h3>
     <p>
-      A sealed JSON envelope containing the payload, a timestamp, the RSA‑PSS
-      signature, and the embedded public key. Canonicalization and hashing are
-      performed internally and are not stored in the envelope.
+      A sealed JSON envelope containing:
     </p>
+    <ul>
+      <li><code>version</code> — envelope format version</li>
+      <li><code>timestamp</code> — ISO‑8601 timestamp</li>
+      <li><code>payload</code> — the original value</li>
+      <li><code>signature.algorithm</code> — always <code>RSA-PSS-SHA256</code></li>
+      <li><code>signature.publicKey</code> — PEM‑encoded public key</li>
+      <li><code>signature.value</code> — Base64 signature</li>
+    </ul>
 
-    <!-- verify -->
-    <h2>verify(sealed)</h2>
+    <!-- verifyBackup -->
+    <h2>verifyBackup(sealed)</h2>
     <p>
       Verifies the authenticity and integrity of a sealed envelope. The
       embedded public key is used to validate the RSA‑PSS signature.
     </p>
 
-    <pre><code>import { verify } from "json-seal";
+    <pre><code>import { verifyBackup } from "json-seal";
 
-const result = await verify(sealed);
+const result = await verifyBackup(sealed);
 
-if (result.ok) {
-  console.log("Authentic:", result.value);
+if (result.valid) {
+  console.log("Authentic:", result.payload);
 } else {
-  console.error("Verification failed:", result.reason);
+  console.error("Verification failed");
 }
 </code></pre>
 
     <h3>Returns</h3>
     <ul>
-      <li><strong>ok</strong> — boolean indicating authenticity</li>
-      <li><strong>value</strong> — the original value (if authentic)</li>
-      <li><strong>reason</strong> — explanation for verification failure</li>
+      <li><strong>valid</strong> — boolean indicating authenticity</li>
+      <li><strong>payload</strong> — the original value (only if valid)</li>
     </ul>
 
     <!-- canonicalize -->
     <h2>canonicalize(value)</h2>
     <p>
       Converts a JavaScript value into a deterministic canonical representation
-      using the RFC 8785 JSON Canonicalization Scheme. Used internally by
-      <code>seal</code> and <code>verify</code>.
+      using the RFC 8785 JSON Canonicalization Scheme. Used internally by
+      <code>signPayload</code> and <code>verifyBackup</code>.
     </p>
 
     <pre><code>import { canonicalize } from "json-seal";
