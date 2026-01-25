@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>json‑seal — Integrity Model</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <main>
+        <h1>Integrity Model</h1>
+
+        <p>
+            json‑seal provides a lightweight, explicit integrity and authenticity
+            layer for any JSON‑serializable value. It produces a signed, tamper‑evident
+            envelope containing:
+        </p>
+
+        <ul>
+            <li>the original value</li>
+            <li>a timestamp</li>
+            <li>a digital signature (RSA‑PSS)</li>
+            <li>the embedded public key required for verification</li>
+        </ul>
+
+        <h2>Canonicalization</h2>
+        <p>
+            Before signing, the value is transformed into a stable, deterministic
+            representation using a full implementation of the RFC 8785 JSON
+            Canonicalization Scheme (JCS). This ensures that semantically identical
+            values always produce the same canonical form and therefore the same
+            signature. json‑seal canonicalizes JavaScript values, not raw JSON text.
+        </p>
+        <p>
+            Canonicalization is required because JSON is not deterministic across platforms; without a stable
+            representation, signatures would not verify reliably between different runtimes.
+        </p>
+
+        <h2>Digest</h2>
+        <p>
+            The canonical form is signed using RSA‑PSS with SHA‑256. Internally, the canonical bytes are hashed with
+            SHA‑256 as part of the signature operation. The digest is not stored in the envelope; it is recomputed
+            implicitly during verification.
+        </p>
+
+        <h2>Digital Signature</h2>
+        <p>
+            json‑seal signs the canonicalized payload using RSA‑PSS with SHA‑256.
+            Hashing is performed internally by the signature algorithm.
+            The signature proves that the sealed document was created by whoever holds the
+            corresponding private key. The public key is embedded directly in the
+            envelope, making verification portable and self‑contained.
+        </p>
+
+        <h2>Verification</h2>
+        <p>
+            Verification re‑canonicalizes the payload and validates the RSA‑PSS signature
+            using the embedded public key. If the signature is valid, the document is
+            authentic and unmodified.
+        </p>
+
+        <h2>What is guaranteed</h2>
+        <ul>
+            <li>Any modification to the value is detectable</li>
+            <li>RFC 8785 canonicalization ensures deterministic behavior across environments</li>
+            <li>RSA‑PSS signatures guarantee authenticity</li>
+            <li>Verification is self‑contained and portable</li>
+        </ul>
+
+        <h2>What is not guaranteed</h2>
+        <ul>
+            <li>No confidentiality — values remain visible</li>
+            <li>No access control — anyone can verify, but only the private key holder can seal</li>
+            <li>No encryption — this is authenticity and integrity only</li>
+        </ul>
+
+        <p>
+            json‑seal is intentionally small. It avoids ceremony and avoids
+            over‑promising. Its goal is clarity, portability, and long‑term trust.
+        </p>
+
+        <p><a href="index.html">← Back</a></p>
+    </main>
+</body>
+</html>

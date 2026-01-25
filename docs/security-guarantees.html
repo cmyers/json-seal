@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>json‑seal — Security Guarantees</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main>
+    <h1>Security Guarantees</h1>
+
+    <p>
+      json‑seal provides authenticity and integrity for JSON‑serializable values.
+      It does this through RFC 8785 canonicalization, SHA‑256 hashing, and
+      RSA‑PSS signatures. The guarantees below describe exactly what the system
+      provides — and what it intentionally does not.
+    </p>
+
+    <h2>What json‑seal guarantees</h2>
+
+    <h3>Integrity</h3>
+    <p>
+      Any modification to the payload or signature is detectable. Verification
+      fails if even a single byte changes. Canonicalization and hashing are
+      recomputed during verification to ensure correctness.
+    </p>
+
+    <h3>Authenticity</h3>
+    <p>
+      Only the holder of the private key can produce a valid signature. Anyone
+      with the embedded public key can verify it.
+    </p>
+
+    <h3>Deterministic behavior</h3>
+    <p>
+      RFC 8785 canonicalization ensures that semantically identical values always
+      produce the same canonical form and signature across environments.
+    </p>
+
+    <h3>Self‑contained verification</h3>
+    <p>
+      Each envelope embeds its own public key. Verification does not require
+      external infrastructure, registries, or trust stores.
+    </p>
+
+    <h3>Long‑term stability</h3>
+    <p>
+      The envelope format is versioned. Old envelopes remain verifiable even if
+      new keys are generated or the application evolves.
+    </p>
+
+    <h2>What json‑seal does not guarantee</h2>
+
+    <h3>No confidentiality</h3>
+    <p>
+      Signed values remain visible. json‑seal does not encrypt or hide data.
+    </p>
+
+    <h3>No access control</h3>
+    <p>
+      Anyone can verify an envelope. json‑seal does not restrict who can read or
+      validate signed data.
+    </p>
+
+    <h3>No identity binding</h3>
+    <p>
+      json‑seal proves that a private key created the signature, but it does not
+      assert who owns that key. Identity must be layered on top.
+    </p>
+
+    <h3>No revocation</h3>
+    <p>
+      Once an envelope is signed, it remains valid as long as the public key is
+      trusted. json‑seal does not provide key revocation or expiration.
+    </p>
+
+    <h3>No transport security</h3>
+    <p>
+      json‑seal protects the data itself, not the channel. Use HTTPS or another
+      secure transport when needed.
+    </p>
+
+    <h2>Threat model</h2>
+    <p>
+      json‑seal protects against tampering, corruption, and unauthorized
+      modification of JSON data. It does not protect against key compromise,
+      malicious signers, or unauthorized access to plaintext values.
+    </p>
+
+    <p>
+      The system is intentionally narrow in scope. Its goal is to provide a
+      clear, portable, cryptographically sound integrity layer without ceremony
+      or hidden assumptions.
+    </p>
+
+    <p><a href="index.html">← Back</a></p>
+  </main>
+</body>
+</html>

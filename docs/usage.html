@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>json‑seal — Usage</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main>
+    <h1>Usage</h1>
+
+    <p>
+      json‑seal exposes two primary operations:
+      <strong>signPayload</strong> and <strong>verifyBackup</strong>, along with a helper
+      for generating signing keys.
+    </p>
+
+    <h2>1. Generate a key pair</h2>
+    <p>
+      Signing requires an RSA‑PSS private key. Verification uses the embedded
+      public key.
+    </p>
+
+    <pre><code>import { generateKeyPair } from "json-seal";
+
+const { publicKey, privateKey } = await generateKeyPair();
+</code></pre>
+
+    <h2>2. Signing a value</h2>
+    <p>
+      Sign any JSON‑serializable value into a tamper‑evident envelope.
+      The envelope includes the original payload, a timestamp, the RSA‑PSS
+      signature, and the embedded public key.
+    </p>
+    <p>
+      Internally, the payload is canonicalized using the RFC 8785 JSON
+      Canonicalization Scheme. The canonical bytes are then signed using
+      RSA‑PSS with SHA‑256.
+    </p>
+
+    <pre><code>import { signPayload } from "json-seal";
+
+const sealed = await signPayload(
+  { user: "chris", role: "admin" },
+  privateKey,
+  publicKey
+);
+
+// persist or transmit `sealed`
+</code></pre>
+
+    <h2>3. Verifying a signed value</h2>
+    <p>
+      Verification re‑canonicalizes the payload using RFC 8785 and validates the
+      RSA‑PSS signature using the embedded public key. If the signature is valid,
+      the document is authentic and unmodified.
+    </p>
+
+    <pre><code>import { verifyBackup } from "json-seal";
+
+const result = await verifyBackup(sealed);
+
+if (result.valid) {
+  console.log("Document is authentic");
+  console.log(result.payload); // original value
+} else {
+  console.error("Verification failed");
+}
+</code></pre>
+
+    <h2>Error handling</h2>
+    <p>
+      Verification failures are returned through the result object rather than
+      thrown, allowing you to route failures explicitly.
+    </p>
+
+    <p><a href="index.html">← Back</a></p>
+  </main>
+</body>
+</html>
