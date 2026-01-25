@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>json‑seal — Install</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main>
+    <h1>Install</h1>
+
+    <p>
+      json‑seal is a small, dependency‑free package built on the WebCrypto API.
+    </p>
+    <p>
+      It works in modern Node runtimes with SubtleCrypto support and in all
+      evergreen browsers.
+    </p>
+
+    <pre><code>npm install json-seal</code></pre>
+
+    <h2>Other install methods</h2>
+
+    <pre><code># yarn
+yarn add json-seal
+
+# pnpm
+pnpm add json-seal
+
+# bun
+bun add json-seal
+</code></pre>
+
+    <h2>Deno</h2>
+    <p>Use the npm compatibility layer:</p>
+
+    <pre><code>import {
+  generateKeyPair,
+  signPayload,
+  verifyBackup
+} from "npm:json-seal";
+</code></pre>
+
+    <h2>Browser (no bundler)</h2>
+    <p>Use an import map to load json‑seal directly:</p>
+
+    <pre><code>&lt;script type="importmap"&gt;
+{
+  "imports": {
+    "json-seal": "https://esm.sh/json-seal"
+  }
+}
+&lt;/script&gt;
+
+&lt;script type="module"&gt;
+  import {
+    generateKeyPair,
+    signPayload,
+    verifyBackup
+  } from "json-seal";
+
+  const { publicKey, privateKey } = await generateKeyPair();
+
+  const sealed = await signPayload({ message: "hello" }, privateKey, publicKey);
+  const result = await verifyBackup(sealed);
+&lt;/script&gt;
+</code></pre>
+
+    <p>
+      No build steps, frameworks, or external cryptography libraries are
+      required.
+    </p>
+
+    <p><a href="index.html">← Back</a></p>
+  </main>
+</body>
+</html>

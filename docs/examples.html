@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>json‑seal — Examples</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main>
+    <h1>Examples</h1>
+
+    <p>
+      json‑seal can be used anywhere you need a portable, tamper‑evident
+      representation of JSON data. Below are small, focused examples that
+      illustrate common patterns.
+    </p>
+
+    <h2>Sealing a configuration file</h2>
+    <p>
+      Useful for local apps, CLI tools, or distributed systems that need to
+      ensure configuration integrity.
+    </p>
+
+    <pre><code>import { generateKeyPair, signPayload } from "json-seal";
+
+const { publicKey, privateKey } = await generateKeyPair();
+
+const prefs = {
+  language: "en-GB",
+  timezone: "Europe/London",
+  notifications: {
+    email: true,
+    push: false
+  }
+};
+
+const sealed = await signPayload(prefs, privateKey, publicKey);
+// write `sealed` to disk
+</code></pre>
+
+    <h2>Verifying a received document</h2>
+    <p>
+      Any environment with WebCrypto can verify a sealed envelope using the
+      embedded public key.
+    </p>
+
+    <pre><code>import { verifyBackup } from "json-seal";
+
+// `sealed` loaded from disk or received over the network
+const result = await verifyBackup(sealed);
+
+if (result.valid) {
+  console.log("Authentic:", result.payload);
+} else {
+  console.error("Verification failed");
+}
+</code></pre>
+
+    <h2>Sealing data before syncing</h2>
+    <p>
+      Ideal for offline‑first apps where data may be stored locally and synced
+      later. Each record carries its own authenticity.
+    </p>
+
+    <pre><code>const record = {
+  id: "task-123",
+  text: "Buy milk",
+  completed: false
+};
+
+const sealedRecord = await signPayload(record, privateKey, publicKey);
+// sync `sealedRecord` to the server
+</code></pre>
+
+    <h2>Embedding sealed data in a backup</h2>
+    <p>
+      Backups remain verifiable anywhere they are restored, thanks to the
+      embedded public key.
+    </p>
+
+    <pre><code>const backup = {
+  timestamp: Date.now(),
+  items: [
+    await signPayload({ note: "hello" }, privateKey, publicKey),
+    await signPayload({ note: "world" }, privateKey, publicKey)
+  ]
+};
+
+// store `backup` anywhere
+</code></pre>
+
+    <h2>Using canonicalization directly</h2>
+    <p>
+      Useful when you need deterministic JSON output for hashing or comparison. json‑seal implements the full RFC 8785
+      JSON Canonicalization Scheme.
+    </p>
+
+    <pre><code>import { canonicalize } from "json-seal";
+
+const text = canonicalize({ b: 2, a: 1 });
+// {"a":1,"b":2}
+</code></pre>
+
+    <p><a href="index.html">← Back</a></p>
+  </main>
+</body>
+
+</html>
