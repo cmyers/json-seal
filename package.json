@@ -46,7 +46,8 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "prepare": "npm run build"
   },
   "license": "MIT",
   "devDependencies": {
