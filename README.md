@@ -15,6 +15,18 @@
 
 ---
 
+## **What json-seal is for**
+
+json-seal signs structured JSON data. It canonicalizes a JavaScript value into
+deterministic JSON text, encodes it as UTF-8 bytes, and signs those bytes using
+WebCrypto.
+
+It is not a generic byte-signing library. If you need to sign arbitrary bytes,
+use WebCrypto directly. json-seal is specifically for authenticity of JSON-
+compatible data.
+
+---
+
 ## **Why json‑seal**
 
 Apps often need to store or transmit JSON in a way that guarantees it hasn’t been tampered with - without relying on servers, tokens, or opaque binary formats. Most security libraries focus on encrypted blobs, authentication tokens, or low‑level crypto primitives, but none solve the simple problem:
