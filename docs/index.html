@@ -4,15 +4,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>json‑seal - Lightweight, portable JSON data integrity</title>
+  <title>json-seal - Lightweight, portable JSON data integrity</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
   <main>
-    <h1>json‑seal</h1>
+    <h1>json-seal</h1>
 
     <p class="subtitle">Lightweight, portable JSON data integrity - without the complexity.</p>
+
+    <p>
+      json-seal signs structured JSON data. It canonicalizes a JavaScript value
+      into deterministic JSON text, encodes it as UTF-8 bytes, and signs those
+      bytes using WebCrypto. It is not a generic byte-signing library.
+    </p>
 
     <pre><code>import {
   generateKeyPair,
@@ -27,13 +33,14 @@ const result = await verifyBackup(sealed);
 </code></pre>
 
     <p>
-      json‑seal creates a cryptographically signed, tamper‑evident envelope
-      around any JSON‑serializable value. It implements the full RFC 8785 JSON
-      Canonicalization Scheme and uses RSA‑PSS signatures to guarantee both
+      json-seal creates a cryptographically signed, tamper-evident envelope
+      around any JSON-serializable value. It implements the full RFC 8785 JSON
+      Canonicalization Scheme and uses RSA-PSS signatures to guarantee both
       integrity and authenticity.
     </p>
 
     <nav>
+      <a href="index.html">Overview</a>
       <a href="install.html">Install</a>
       <a href="usage.html">Usage</a>
       <a href="integrity-model.html">Integrity Model</a>
