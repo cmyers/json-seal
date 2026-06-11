@@ -1,14 +1,7 @@
 // Cross‑runtime base64 helpers (browser + Node 18+)
 
-const _atob =
-  typeof atob === "function"
-    ? atob
-    : (b64: string) => Buffer.from(b64, "base64").toString("binary");
-
-const _btoa =
-  typeof btoa === "function"
-    ? btoa
-    : (bin: string) => Buffer.from(bin, "binary").toString("base64");
+const _atob = atob;
+const _btoa = btoa;
 
 export function arrayBufferToBase64(buf: ArrayBuffer): string {
   const bytes = new Uint8Array(buf);
