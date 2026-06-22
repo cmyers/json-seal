@@ -1,13 +1,15 @@
 import { pemToArrayBuffer, arrayBufferToPem } from "./pem.js";
 
-export async function generateKeyPair() {
+export type KeyAlgorithm = "RSA-PSS" | "Ed25519";
+
+export async function generateKeyPair(algorithm: KeyAlgorithm = "RSA-PSS") {
+  const params: RsaHashedKeyGenParams | EcKeyGenParams =
+    algorithm === "RSA-PSS"
+      ? { name: "RSA-PSS", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }
+      : { name: "Ed25519" } as EcKeyGenParams;
+
   const { publicKey, privateKey } = await crypto.subtle.generateKey(
-    {
-      name: "RSA-PSS",
-      modulusLength: 2048,
-      publicExponent: new Uint8Array([1, 0, 1]),
-      hash: "SHA-256"
-    },
+    params,
     true,
     ["sign", "verify"]
   );
@@ -21,32 +23,24 @@ export async function generateKeyPair() {
   };
 }
 
-export async function importPrivateKey(privateKeyPem: string): Promise<CryptoKey> {
+export async function importPrivateKey(privateKeyPem: string, algorithm: KeyAlgorithm = "RSA-PSS"): Promise<CryptoKey> {
   const pkcs8 = pemToArrayBuffer(privateKeyPem);
 
-  return crypto.subtle.importKey(
-    "pkcs8",
-    pkcs8,
-    {
-      name: "RSA-PSS",
-      hash: "SHA-256"
-    },
-    false,
-    ["sign"]
-  );
+  const params =
+    algorithm === "RSA-PSS"
+      ? { name: "RSA-PSS", hash: "SHA-256" }
+      : { name: "Ed25519" };
+
+  return crypto.subtle.importKey("pkcs8", pkcs8, params, false, ["sign"]);
 }
 
-export async function importPublicKey(publicKeyPem: string): Promise<CryptoKey> {
+export async function importPublicKey(publicKeyPem: string, algorithm: KeyAlgorithm = "RSA-PSS"): Promise<CryptoKey> {
   const spki = pemToArrayBuffer(publicKeyPem);
 
-  return crypto.subtle.importKey(
-    "spki",
-    spki,
-    {
-      name: "RSA-PSS",
-      hash: "SHA-256"
-    },
-    false,
-    ["verify"]
-  );
+  const params =
+    algorithm === "RSA-PSS"
+      ? { name: "RSA-PSS", hash: "SHA-256" }
+      : { name: "Ed25519" };
+
+  return crypto.subtle.importKey("spki", spki, params, false, ["verify"]);
 }
