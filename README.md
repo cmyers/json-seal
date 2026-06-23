@@ -1,4 +1,4 @@
-<h1 align="center">json-seal</h1>
+﻿<h1 align="center">json-seal</h1>
 
 <p align="center">
   <img src="https://github.com/cmyers/json-seal/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI" />
@@ -96,9 +96,16 @@ Deterministic, cross‑runtime canonicalization:
 - duplicate‑key rejection  
 - stable UTF‑8 output  
 
-### **RSA‑PSS Signatures**
-Modern asymmetric signing using WebCrypto.  
+### **RSA‑PSS and Ed25519 Signatures**
+Modern asymmetric signing using WebCrypto with your choice of algorithm:
+
+- **RSA‑PSS** (default) — 2048‑bit, SHA‑256, saltLength 32
+- **Ed25519** - compact, fast, deterministic signatures
+
 No shared secrets. No servers. No dependencies.
+
+### **Algorithm Auto‑Detection**
+`verifyBackup()` reads the `algorithm` field embedded in the backup and selects the correct verification path automatically - no caller configuration needed.
 
 ### **Portable JSON Backup Format**
 Everything needed for verification is embedded:
@@ -112,8 +119,9 @@ Everything needed for verification is embedded:
 Browsers, PWAs, Node 18+, Bun, Deno, and mobile runtimes.
 
 ### **Interoperability**
-json‑seal follows the WebCrypto RSA‑PSS specification (SHA‑256, saltLength = 32).
-Environments built directly on OpenSSL defaults may not verify signatures unless configured to match WebCrypto’s parameters
+For RSA-PSS, json‑seal follows the WebCrypto specification (SHA‑256, saltLength = 32).
+Environments built directly on OpenSSL defaults may not verify RSA-PSS signatures unless configured to match these parameters.  
+Ed25519 signatures follow the standard and interoperate with any compliant Ed25519 implementation.
 
 ### **Zero Dependencies**
 Uses the built‑in WebCrypto API (no polyfills, no external crypto libraries). Small, auditable, and safe for long‑term use.
@@ -135,7 +143,11 @@ npm install json-seal
 ```ts
 import { generateKeyPair } from "json-seal";
 
+// RSA-PSS (default)
 const { privateKey, publicKey } = await generateKeyPair();
+
+// Ed25519
+const { privateKey, publicKey } = await generateKeyPair("Ed25519");
 ```
 
 ### **Sign a payload**
@@ -145,7 +157,11 @@ import { signPayload } from "json-seal";
 
 const payload = { id: 1, data: "hello" };
 
+// RSA-PSS (default)
 const backup = await signPayload(payload, privateKey, publicKey);
+
+// Ed25519
+const backup = await signPayload(payload, privateKey, publicKey, { algorithm: "Ed25519" });
 ```
 
 ### **Verify a backup**
@@ -164,6 +180,8 @@ if (result.valid) {
 
 ## **Example Backup**
 
+RSA-PSS:
+
 ```json
 {
   "version": 1,
@@ -171,6 +189,21 @@ if (result.valid) {
   "payload": { "id": 1, "data": "hello" },
   "signature": {
     "algorithm": "RSA-PSS-SHA256",
+    "publicKey": "-----BEGIN PUBLIC KEY----- ...",
+    "value": "base64-signature"
+  }
+}
+```
+
+Ed25519:
+
+```json
+{
+  "version": 1,
+  "timestamp": "2026-01-11T18:24:55.402Z",
+  "payload": { "id": 1, "data": "hello" },
+  "signature": {
+    "algorithm": "Ed25519",
     "publicKey": "-----BEGIN PUBLIC KEY----- ...",
     "value": "base64-signature"
   }
@@ -193,18 +226,26 @@ verifyBackup(tampered).valid; // false
 
 ## **API**
 
-### **`generateKeyPair()`**  
-Generates a 2048‑bit RSA‑PSS keypair.
+### **`generateKeyPair(algorithm?)`**  
+Generates a keypair. `algorithm` is `“RSA-PSS”` (default, 2048‑bit SHA‑256) or `“Ed25519”`.
 
-### **`signPayload(payload, privateKey, publicKey)`**  
+### **`signPayload(payload, privateKey, publicKey, options?)`**  
 Canonicalizes the payload, signs it, and returns a sealed backup object.  
-The payload must be **JSON‑compatible** (see “What json‑seal accepts”).
+The payload must be **JSON‑compatible** (see “What json‑seal accepts”).  
+Pass `{ algorithm: “Ed25519” }` in `options` to use Ed25519; defaults to RSA‑PSS.
 
 ### **`verifyBackup(backup)`**  
-Verifies the signature and returns `{ valid, payload? }`.
+Verifies the signature and returns `{ valid, payload? }`.  
+The algorithm is read automatically from `backup.signature.algorithm`.
 
 ### **`canonicalize(value)`**  
-Full RFC 8785 Canonical JSON implementation.
+Full RFC 8785 Canonical JSON implementation.
+
+### **`importPrivateKey(pem, algorithm?)`**  
+Imports a PEM private key. Defaults to `“RSA-PSS”`; pass `“Ed25519”` for Ed25519 keys.
+
+### **`importPublicKey(pem, algorithm?)`**  
+Imports a PEM public key. Defaults to `“RSA-PSS”`; pass `“Ed25519”` for Ed25519 keys.
 
 ---
 
@@ -237,7 +278,7 @@ json‑seal focuses on a simpler, narrower goal:
 
 - **Pure JSON in, pure JSON out**  
 - **Deterministic canonicalization**  
-- **WebCrypto‑based RSA‑PSS signatures**  
+- **WebCrypto‑based RSA‑PSS and Ed25519 signatures**  
 - **Self‑contained sealed objects with embedded public keys**  
 - **Zero dependencies**  
 - **Portable across browsers, Node, Deno, Bun, and hybrid mobile apps**  
@@ -252,12 +293,13 @@ The test suite covers:
 
 - RFC 8785 canonicalization  
 - Unicode and number edge cases  
-- Valid signatures  
+- Valid RSA‑PSS and Ed25519 signatures  
 - Shallow and deep tampering  
 - Missing / wrong / corrupted signatures  
 - Large payloads  
 - Arrays and primitives  
-- RSA‑PSS non‑determinism  
+- RSA‑PSS non‑determinism and Ed25519 determinism  
+- Algorithm mismatch and unknown algorithm rejection  
 
 Run tests:
 

@@ -4,7 +4,7 @@ import { verifyBackup } from "../src/verify";
 import { canonicalize } from "../src/canonicalize";
 import { generateKeyPair } from "../src/keys";
 
-describe("json-seal", () => {
+describe("RSA-PSS key support", () => {
   let privateKey: string;
   let publicKey: string;
 
